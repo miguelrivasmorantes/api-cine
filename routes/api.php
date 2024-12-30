@@ -10,3 +10,5 @@ Route::get('/hola', function () {
 });
 
 Route::get('/peliculas', [controladorPeliculas::class, 'index']);
+
+Route::get('/pelicula/{id}', [controladorPeliculas::class, 'show']);

@@ -9,17 +9,44 @@ use App\Models\Pelicula;
 class controladorPeliculas extends Controller
 {
     public function index(){
-        $peliculas = Pelicula::all();
-
-        if($peliculas->isEmpty()){
-            $data = [
-                'message' => 'No se encontraron peliculas',
-                'status' => 200
+        $peliculas = Pelicula::with('estudio', 'directore')->get()->map(function($pelicula) {
+            return [
+                'id' => $pelicula->id,
+                'titulo' => $pelicula->titulo,
+                'estreno' => $pelicula->estreno,
+                'taquilla' => $pelicula->taquilla,
+                'pais' => $pelicula->pais,
+                'estudio' => $pelicula->estudio->nombre,
+                'director' => $pelicula->directore ->nombre,
             ];
+        });
 
-            return response()->json($data, 404);
-        }
+        $data = [
+            'peliculas' => $peliculas,
+            'status' => 200,
+        ];
+    
+        return response()->json($data, 200);
+    }    
 
-        return response()->json($peliculas, 200);
+    public function show($id){
+        $pelicula = Pelicula::with('estudio', 'directore')->find($id);
+
+        $pelicula = [
+            'id' => $pelicula->id,
+            'titulo' => $pelicula->titulo,
+            'estreno' => $pelicula->estreno,
+            'taquilla' => $pelicula->taquilla,
+            'pais' => $pelicula->pais,
+            'estudio' => $pelicula->estudio->nombre,
+            'director' => $pelicula->directore->nombre,
+        ];
+
+        $data = [
+            'pelicula' => $pelicula,
+            'status' => 200,
+        ];
+
+        return response()->json($data, 200);
     }
 }
