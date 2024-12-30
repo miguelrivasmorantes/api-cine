@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\Model;
  * 
  * @property Estudio|null $estudio
  * @property Directore|null $directore
- * @property Collection|PeliculaActor[] $pelicula_actors
+ * @property Collection|Actore[] $actore
  * @property Collection|Genero[] $generos
  *
  * @package App\Models
@@ -59,9 +59,9 @@ class Pelicula extends Model
 		return $this->belongsTo(Directore::class, 'id_director');
 	}
 
-	public function pelicula_actors()
+	public function actores()
 	{
-		return $this->hasMany(PeliculaActor::class, 'id_pelicula');
+		return $this->belongsToMany(Actore::class, 'pelicula_actor', 'id_pelicula', 'id_actor');
 	}
 
 	public function generos()
