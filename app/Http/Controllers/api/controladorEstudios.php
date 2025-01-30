@@ -9,13 +9,12 @@ use App\Models\Estudio;
 
 class controladorEstudios extends Controller{
     public function index(){
-        $estudios = Estudio::with('peliculas')->get()->map(function($estudio) {
+        $estudios = Estudio::all()->map(function($estudio) {
             return [
                 'id' => $estudio->id,
                 'nombre' => $estudio->nombre,
                 'pais' => $estudio->pais,
                 'fundacion' => $estudio->fundacion->format('Y-m-d'),
-                'peliculas' => $estudio->peliculas->pluck('titulo'),
             ];
         });
 
