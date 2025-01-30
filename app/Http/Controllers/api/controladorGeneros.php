@@ -17,7 +17,7 @@ class controladorGeneros extends Controller{
         });
 
         if(!$generos){
-            return response()->json(['message' => 'No se encontraron géneros', 'status' => 200], 200);
+            return response()->json(['message' => 'No se encontraron géneros', 'status' => 200]);
         }
 
         $data = [
@@ -32,7 +32,7 @@ class controladorGeneros extends Controller{
         $genero = Genero::with('peliculas')->find($id);
 
         if(!$genero){
-            return response()->json(['message' => 'Género no encontrado', 'status' => 200], 200);
+            return response()->json(['message' => 'Género no encontrado', 'status' => 200]);
         }
 
         $genero = [
@@ -44,6 +44,33 @@ class controladorGeneros extends Controller{
         $data = [
             'genero' => $genero,
             'status' => 200,
+        ];
+
+        return $data;
+    }
+
+    public function store(Request $request){
+        $validator = Validator::make($request->all(), [
+            'genero' => 'required|string|max:255|unique:generos,nombre'
+        ]);
+
+        if($validator->fails()){
+            $data = [
+                'message' => 'Error en la validación de los datos',
+                'errors' => $validator->errors(),
+                'status' => 400,
+            ];
+
+            return $data;
+        }
+
+        $genero = Genero::create([
+            'nombre' => $request->genero,
+        ]);
+
+        $data = [
+            'genero' => $genero,
+            'status' => 201,
         ];
 
         return $data;

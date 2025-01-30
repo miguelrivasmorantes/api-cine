@@ -19,7 +19,7 @@ class controladorEstudios extends Controller{
         });
 
         if(!$estudios){
-            return response()->json(['message' => 'No se encontraron estudios', 'status' => 200], 200);
+            return response()->json(['message' => 'No se encontraron estudios', 'status' => 200]);
         }
 
         $data = [
@@ -34,7 +34,7 @@ class controladorEstudios extends Controller{
         $estudio = Estudio::with('peliculas')->find($id);
 
         if(!$estudio){
-            return response()->json(['message' => 'Estudio no encontrado', 'status' => 200], 200);
+            return response()->json(['message' => 'Estudio no encontrado', 'status' => 200]);
         }
 
         $estudio = [
@@ -91,7 +91,7 @@ class controladorEstudios extends Controller{
             'status' => 201,
         ];
 
-        return response()->json($data, 201);
+        return $data;
     }
 
     public function update(Request $request, $id){
@@ -131,6 +131,6 @@ class controladorEstudios extends Controller{
           'status' => 202,  
         ];
 
-        return response()->json($data, 202);
+        return $data;
     }
 }
