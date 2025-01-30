@@ -94,4 +94,44 @@ class controladorEstudios extends Controller{
 
         return response()->json($data, 201);
     }
+
+    public function update(Request $request, $id){
+        $estudio = Estudio::findOrFail($id);
+
+        $validator = Validator::make($request->all(), [
+            'nombre' => 'string|max:255|unique:estudios,nombre',
+            'pais' => 'string|max:255',
+            'fundacion' => 'date_format:Y-m-d',
+        ]);
+
+        if($validator->fails()){
+            $data = [
+                'message' => 'Error en la validación de los datos',
+                'errors' => $validator->errors(),
+                'status' => 400,
+            ];
+
+            return $data;
+        }
+
+        $estudio->fill($request->all());
+
+        if(!$estudio){
+            $data = [
+                'message' => 'Error al crear el estudio',
+                'status' => 500,
+            ];
+
+            return $data;
+        }
+
+        $estudio->save();
+
+        $data = [
+          'estudio' => $estudio,
+          'status' => 202,  
+        ];
+
+        return response()->json($data, 202);
+    }
 }
