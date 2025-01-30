@@ -30,4 +30,27 @@ class controladorEstudios extends Controller{
 
         return $data;
     }
+
+    public function show($id){
+        $estudio = Estudio::with('peliculas')->find($id);
+
+        if(!$estudio){
+            return response()->json(['message' => 'Estudio no encontrado', 'status' => 200], 200);
+        }
+
+        $estudio = [
+            'id' => $estudio->id,
+            'nombre' => $estudio->nombre,
+            'pais' => $estudio->pais,
+            'fundacion' => $estudio->fundacion,
+            'peliculas' => $estudio->peliculas->pluck('titulo'),
+        ];
+
+        $data = [
+            'estudio' => $estudio,
+            'status' => 200,
+        ];
+
+        return $data;
+    }
 }
