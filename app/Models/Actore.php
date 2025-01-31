@@ -37,8 +37,8 @@ class Actore extends Model
 		'nacionalidad'
 	];
 
-	public function pelicula_actors()
+	public function peliculas()
 	{
-		return $this->hasMany(PeliculaActor::class, 'id_actor');
+		return $this->belongsToMany(Pelicula::class, 'pelicula_actor', 'id_actor', 'id_pelicula');
 	}
 }
