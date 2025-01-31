@@ -93,4 +93,44 @@ class controladorDirectores extends Controller{
 
         return $data;
     }
+
+    public function update(Request $request, $id){
+        $director = Directore::findOrFail($id);
+
+        $validator = Validator::make($request->all(), [
+            'nombre' => 'string|max:255|unique:directores,nombre',
+            'fecha_nacimiento' => 'date_format:Y-m-d',
+            'nacionalidad' => 'string|max:255',
+        ]);
+
+        if($validator->fails()){
+            $data = [
+                'message' => 'Error en la validación de los datos',
+                'errors' => $validator->errors(),
+                'status' => 400,
+            ];
+
+            return $data;
+        }
+
+        $director->fill($request->all());
+
+        if(!$director){
+            $data = [
+                'message' => 'Error al crear el director',
+                'status' => 500,
+            ];
+
+            return $data;
+        }
+
+        $director->save();
+
+        $data = [
+          'director' => $director,
+          'status' => 202,  
+        ];
+
+        return $data;
+    }
 }
