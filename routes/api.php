@@ -19,6 +19,10 @@ Route::get('/peliculas', [controladorPeliculas::class, 'index']);
 Route::get('/peliculas/{id}', [controladorPeliculas::class, 'show']);
 
 Route::post('/peliculas', [controladorPeliculas::class, 'store']);
+
+Route::patch('/peliculas/{id}', [controladorPeliculas::class, 'update']);
+
+Route::delete('/peliculas/{id}', [controladorPeliculas::class, 'destroy']);
 // End: Operations for Películas
 
 

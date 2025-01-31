@@ -54,7 +54,7 @@ class Pelicula extends Model
 		return $this->belongsTo(Estudio::class, 'id_estudio');
 	}
 
-	public function directore()
+	public function director()
 	{
 		return $this->belongsTo(Directore::class, 'id_director');
 	}
