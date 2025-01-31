@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\controladorPeliculas;
 use App\Http\Controllers\api\controladorEstudios;
 use App\Http\Controllers\api\controladorGeneros;
+use App\Http\Controllers\api\controladorDirectores;
 
 Route::get('/hola', function () {
     return 'Hola Mundo!!!';
@@ -37,4 +38,15 @@ Route::get('/generos', [controladorGeneros::class, 'index']);
 Route::get('/generos/{id}', [controladorGeneros::class, 'show']);
 
 Route::post('/generos', [controladorGeneros::class, 'store']);
-// Start: Operatios for Géneros
+// End: Operatios for Géneros
+
+
+// Start: Operatios for Directores
+Route::get('/directores', [controladorDirectores::class, 'index']);
+
+Route::get('/directores/{id}', [controladorDirectores::class, 'show']);
+
+Route::post('/directores', [controladorDirectores::class, 'show']);
+
+Route::patch('/directores/{id}', [controladorDirectores::class, 'update']);
+// End: Operatios for Directores
