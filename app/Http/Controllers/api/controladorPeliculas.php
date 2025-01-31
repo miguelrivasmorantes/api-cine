@@ -25,7 +25,7 @@ class controladorPeliculas extends Controller
         });
 
         if (!$peliculas) {
-            return response()->json(['message' => 'No se encontraron peliculas', 'status' => 200], 200);
+            return response()->json(['message' => 'No se encontraron peliculas', 'status' => 200]);
         }
 
         $data = [
@@ -33,14 +33,14 @@ class controladorPeliculas extends Controller
             'status' => 200,
         ];
     
-        return response()->json($data, 200);
+        return $data;
     }    
 
     public function show($id){
         $pelicula = Pelicula::with('estudio', 'directore', 'generos', 'actores')->find($id);
 
         if (!$pelicula) {
-            return response()->json(['message' => 'Película no encontrada', 'status' => 200], 200);
+            return response()->json(['message' => 'Película no encontrada', 'status' => 200]);
         }
 
         $pelicula = [
@@ -60,6 +60,6 @@ class controladorPeliculas extends Controller
             'status' => 200,
         ];
 
-        return response()->json($data, 200);
+        return $data;
     }
 }
