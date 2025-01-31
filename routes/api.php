@@ -46,7 +46,7 @@ Route::get('/directores', [controladorDirectores::class, 'index']);
 
 Route::get('/directores/{id}', [controladorDirectores::class, 'show']);
 
-Route::post('/directores', [controladorDirectores::class, 'show']);
+Route::post('/directores', [controladorDirectores::class, 'store']);
 
 Route::patch('/directores/{id}', [controladorDirectores::class, 'update']);
 // End: Operatios for Directores
