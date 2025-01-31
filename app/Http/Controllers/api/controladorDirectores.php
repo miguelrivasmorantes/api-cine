@@ -29,4 +29,27 @@ class controladorDirectores extends Controller{
 
         return $data;
     }
+
+    public function show($id){
+        $director = Directore::with('peliculas')->find($id);
+
+        if(!$director){
+            return response()->json(['message' => 'Director no encontrado', 'status' => 200]);
+        }
+
+        $director = [
+            'id' => $director->id,
+            'nombre' => $director->nombre,
+            'fecha_nacimiento' => $director->fecha_nacimiento->format('Y-m-d'),
+            'nacionalidad' => $director->nacionalidad,
+            'peliculas' => $director->peliculas->pluck('titulo'),
+        ];
+
+        $data = [
+            'director' => $director,
+            'status' => 200,
+        ];
+
+        return $data;
+    }
 }
