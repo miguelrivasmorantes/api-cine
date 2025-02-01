@@ -126,4 +126,68 @@ class controladorPeliculas extends Controller
 
         return $data;
     }
+
+    public function update(Request $request, $id){
+        $pelicula = Pelicula::findOrFail($id);
+
+        $validator = Validator::make($request->all(), [
+            'titulo' => 'string|max:255|unique:peliculas,titulo',
+            'estreno' => 'date_format:Y-m-d',
+            'taquilla' => 'numeric',
+            'pais' => 'string|max:255',
+            'estudio' => 'string|max:255|exists:estudios,nombre',
+            'director' => 'string|max:255|exists:directores,nombre',
+            'generos' => 'array',
+            'generos.*' => 'string|max:255|exists:generos,nombre',
+            'actores' => 'array',
+            'actores.*' => 'string|max:255|exists:actores,nombre',
+        ]);
+
+        if($validator->fails()){
+            $data = [
+                'message' => 'Error en la validación de los datos',
+                'errors' => $validator->errors(),
+                'status' => 400,
+            ];
+
+            return $data;
+        }
+
+        if ($request->has('director')) {
+            $pelicula['id_director'] = Directore::where('nombre', $request->director)->value('id');
+        }
+        if ($request->has('estudio')) {
+            $pelicula['id_estudio'] = Estudio::where('nombre', $request->estudio)->value('id');
+        }
+
+        $pelicula->fill($request->all());
+
+        if(!$pelicula){
+            $data = [
+                'message' => 'Error al actualizar la pelicula',
+                'status' => 500,
+            ];
+
+            return $data;
+        }
+
+        $pelicula->save();
+
+        if ($request->has('generos')) {
+            $generoId = Genero::whereIn('nombre', $request->generos)->pluck('id')->toArray();
+            $pelicula->generos()->sync($generoId);
+        }
+
+        if ($request->has('actores')) {
+            $actorId = Actore::whereIn('nombre', $request->actores)->pluck('id')->toArray();
+            $pelicula->actores()->sync($actorId);
+        }
+
+        $data = [
+          'pelicula' => $pelicula,
+          'status' => 202,  
+        ];
+
+        return $data;
+    }
 }

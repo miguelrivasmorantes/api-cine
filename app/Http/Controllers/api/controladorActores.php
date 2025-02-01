@@ -117,7 +117,7 @@ class controladorActores extends Controller{
 
         if(!$actor){
             $data = [
-                'message' => 'Error al crear el actor',
+                'message' => 'Error al actualizar el actor',
                 'status' => 500,
             ];
 
