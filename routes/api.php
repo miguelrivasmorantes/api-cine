@@ -23,6 +23,8 @@ Route::post('/peliculas', [controladorPeliculas::class, 'store']);
 Route::patch('/peliculas/{id}', [controladorPeliculas::class, 'update']);
 
 Route::delete('/peliculas/{id}', [controladorPeliculas::class, 'destroy']);
+
+Route::get('/peliculas', [controladorPeliculas::class, 'search']);
 // End: Operations for Películas
 
 

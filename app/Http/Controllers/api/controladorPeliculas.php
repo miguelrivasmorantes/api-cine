@@ -214,4 +214,33 @@ class controladorPeliculas extends Controller
 
         return $data;
     }
+
+    public function search(Request $request){
+        $query = $request->input('query');
+
+        $peliculas = Pelicula::where('titulo', 'like', "%{$query}%")->get()->map(function($pelicula) {
+            return [
+                'id' => $pelicula->id,
+                'titulo' => $pelicula->titulo,
+                'estreno' => $pelicula->estreno->format('Y-m-d'),
+                'taquilla' => $pelicula->taquilla,
+                'pais' => $pelicula->pais,
+                'estudio' => $pelicula->estudio->nombre,
+                'director' => $pelicula->director ->nombre,
+                'generos' => $pelicula->generos->pluck('nombre'),
+                'actores' => $pelicula->actores->pluck('nombre'),
+            ];
+        });;
+
+        if ($peliculas->isEmpty()) {
+            return response()->json(['message' => 'No se ha encontrado una pelicula con la información proporcionada', 'status' => 200]);
+        }
+
+        $data = [
+            'pelicula' => $peliculas,
+            'status' => 200,
+        ];
+
+        return $data;
+    }
 }
