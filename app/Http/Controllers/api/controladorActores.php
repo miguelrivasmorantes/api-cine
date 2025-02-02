@@ -95,7 +95,11 @@ class controladorActores extends Controller{
     }
 
     public function update(Request $request, $id){
-        $actor = Actore::findOrFail($id);
+        $actor = Actore::find($id);
+
+        if (!$actor) {
+            return response()->json(['message' => 'Actor no encontrado', 'status' => 200]);
+        }
 
         $validator = Validator::make($request->all(), [
             'nombre' => 'string|max:255|unique:actores,nombre',

@@ -95,7 +95,11 @@ class controladorEstudios extends Controller{
     }
 
     public function update(Request $request, $id){
-        $estudio = Estudio::findOrFail($id);
+        $estudio = Estudio::find($id);
+
+        if (!$estudio) {
+            return response()->json(['message' => 'Estudio no encontrado', 'status' => 200]);
+        }
 
         $validator = Validator::make($request->all(), [
             'nombre' => 'string|max:255|unique:estudios,nombre',

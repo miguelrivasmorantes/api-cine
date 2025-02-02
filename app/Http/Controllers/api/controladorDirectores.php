@@ -95,7 +95,11 @@ class controladorDirectores extends Controller{
     }
 
     public function update(Request $request, $id){
-        $director = Directore::findOrFail($id);
+        $director = Directore::find($id);
+
+        if (!$director) {
+            return response()->json(['message' => 'Director no encontrado', 'status' => 200]);
+        }
 
         $validator = Validator::make($request->all(), [
             'nombre' => 'string|max:255|unique:directores,nombre',

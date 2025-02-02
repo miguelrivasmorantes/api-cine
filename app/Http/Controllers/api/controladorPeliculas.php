@@ -128,7 +128,11 @@ class controladorPeliculas extends Controller
     }
 
     public function update(Request $request, $id){
-        $pelicula = Pelicula::findOrFail($id);
+        $pelicula = Pelicula::find($id);
+
+        if (!$pelicula) {
+            return response()->json(['message' => 'Película no encontrada', 'status' => 200]);
+        }
 
         $validator = Validator::make($request->all(), [
             'titulo' => 'string|max:255|unique:peliculas,titulo',
@@ -186,6 +190,26 @@ class controladorPeliculas extends Controller
         $data = [
           'pelicula' => $pelicula,
           'status' => 202,  
+        ];
+
+        return $data;
+    }
+
+    public function destroy($id){
+        $pelicula = Pelicula::find($id);
+
+        if (!$pelicula) {
+            return response()->json(['message' => 'Película no encontrada', 'status' => 200]);
+        }
+
+        $pelicula->actores()->detach();
+        $pelicula->generos()->detach();
+
+        $pelicula->delete();
+
+        $data = [
+            'message' => 'Pelicula eliminada',
+            'status' => 200,
         ];
 
         return $data;
