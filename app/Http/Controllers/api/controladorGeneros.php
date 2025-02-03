@@ -13,6 +13,7 @@ class controladorGeneros extends Controller{
             return [
                 'id' => $genero->id,
                 'genero' => $genero->nombre,
+                'imagen' => $genero->img,
             ];
         });
 
@@ -38,6 +39,7 @@ class controladorGeneros extends Controller{
         $genero = [
             'id' => $genero->id,
             'nombre' => $genero->nombre,
+            'imagen' => $genero->img,
             'peliculas' => $genero->peliculas->pluck('titulo'),
         ];
 
@@ -51,7 +53,8 @@ class controladorGeneros extends Controller{
 
     public function store(Request $request){
         $validator = Validator::make($request->all(), [
-            'genero' => 'required|string|max:255|unique:generos,nombre'
+            'genero' => 'required|string|max:255|unique:generos,nombre',
+            'imagen' => 'nullable|string|max:255',
         ]);
 
         if($validator->fails()){
@@ -66,6 +69,7 @@ class controladorGeneros extends Controller{
 
         $genero = Genero::create([
             'nombre' => $request->genero,
+            'imagen' => $request->img,
         ]);
 
         $data = [

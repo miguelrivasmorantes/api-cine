@@ -10,11 +10,12 @@ use App\Models\Directore;
 use App\Models\Estudio;
 use App\Models\Genero;
 use App\Models\Actore;
+use App\Models\Poster;
 
 class controladorPeliculas extends Controller
 {
     public function index(){
-        $peliculas = Pelicula::with('estudio', 'director', 'generos', 'actores')->get()->map(function($pelicula) {
+        $peliculas = Pelicula::with('estudio', 'director', 'generos', 'actores', 'posters')->get()->map(function($pelicula) {
             return [
                 'id' => $pelicula->id,
                 'titulo' => $pelicula->titulo,
@@ -22,9 +23,10 @@ class controladorPeliculas extends Controller
                 'taquilla' => $pelicula->taquilla,
                 'pais' => $pelicula->pais,
                 'estudio' => $pelicula->estudio->nombre,
-                'director' => $pelicula->director ->nombre,
+                'director' => $pelicula->director->nombre,
                 'generos' => $pelicula->generos->pluck('nombre'),
                 'actores' => $pelicula->actores->pluck('nombre'),
+                'posters' => $pelicula->posters->pluck('url'),
             ];
         });
 
@@ -41,7 +43,7 @@ class controladorPeliculas extends Controller
     }    
 
     public function show($id){
-        $pelicula = Pelicula::with('estudio', 'director', 'generos', 'actores')->find($id);
+        $pelicula = Pelicula::with('estudio', 'director', 'generos', 'actores', 'posters')->find($id);
 
         if (!$pelicula) {
             return response()->json(['message' => 'Película no encontrada', 'status' => 200]);
@@ -57,6 +59,7 @@ class controladorPeliculas extends Controller
             'director' => $pelicula->director->nombre,
             'generos' => $pelicula->generos->pluck('nombre'),
             'actores' => $pelicula->actores->pluck('nombre'),
+            'posters' => $pelicula->posters->pluck('url'),
         ];
 
         $data = [
@@ -79,6 +82,8 @@ class controladorPeliculas extends Controller
             'generos.*' => 'required|string|max:255|exists:generos,nombre',
             'actores' => 'required|array',
             'actores.*' => 'required|string|max:255|exists:actores,nombre',
+            'posters' => 'required|array',
+            'posters.*' => 'required|string|url',
         ]);
 
         if($validator->fails()){
@@ -109,6 +114,12 @@ class controladorPeliculas extends Controller
         
         $actorId = Actore::whereIn('nombre', $request->actores)->pluck('id');
         $pelicula->actores()->attach($actorId);
+
+        $posters = array_map(function ($url) use ($pelicula) {
+            return ['id_pelicula' => $pelicula->id, 'url' => $url];
+        }, $request->posters);
+
+        Poster::insert($posters);
 
         if(!$pelicula){
             $data = [
@@ -145,6 +156,8 @@ class controladorPeliculas extends Controller
             'generos.*' => 'string|max:255|exists:generos,nombre',
             'actores' => 'array',
             'actores.*' => 'string|max:255|exists:actores,nombre',
+            'posters' => 'array',
+            'posters.*' => 'string|url',
         ]);
 
         if($validator->fails()){
@@ -187,6 +200,15 @@ class controladorPeliculas extends Controller
             $pelicula->actores()->sync($actorId);
         }
 
+        if ($request->has('posters')) {
+            Poster::where('id_pelicula', $pelicula->id)->delete();
+            $posters = array_map(function ($url) use ($pelicula) {
+                return ['id_pelicula' => $pelicula->id, 'url' => $url];
+            }, $request->posters);
+
+            Poster::insert($posters);
+        }
+
         $data = [
           'pelicula' => $pelicula,
           'status' => 202,  
@@ -204,6 +226,7 @@ class controladorPeliculas extends Controller
 
         $pelicula->actores()->detach();
         $pelicula->generos()->detach();
+        $pelicula->posters()->delete();
 
         $pelicula->delete();
 
@@ -226,11 +249,12 @@ class controladorPeliculas extends Controller
                 'taquilla' => $pelicula->taquilla,
                 'pais' => $pelicula->pais,
                 'estudio' => $pelicula->estudio->nombre,
-                'director' => $pelicula->director ->nombre,
+                'director' => $pelicula->director->nombre,
                 'generos' => $pelicula->generos->pluck('nombre'),
                 'actores' => $pelicula->actores->pluck('nombre'),
+                'posters' => $pelicula->posters->pluck('url'),
             ];
-        });;
+        });
 
         if ($peliculas->isEmpty()) {
             return response()->json(['message' => 'No se ha encontrado una pelicula con la información proporcionada', 'status' => 200]);

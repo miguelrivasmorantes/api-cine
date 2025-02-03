@@ -68,4 +68,9 @@ class Pelicula extends Model
 	{
 		return $this->belongsToMany(Genero::class, 'pelicula_genero', 'id_pelicula', 'id_genero');
 	}
+
+	public function posters()
+	{
+    	return $this->hasMany(Poster::class, 'id_pelicula');
+	}
 }

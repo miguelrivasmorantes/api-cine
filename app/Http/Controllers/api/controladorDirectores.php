@@ -15,6 +15,7 @@ class controladorDirectores extends Controller{
                 'nombre' => $director->nombre,
                 'fecha_nacimiento' => $director->fecha_nacimiento->format('Y-m-d'),
                 'nacionalidad' => $director->nacionalidad,
+                'foto' => $director->url_imagen,
             ];
         });
 
@@ -42,6 +43,7 @@ class controladorDirectores extends Controller{
             'nombre' => $director->nombre,
             'fecha_nacimiento' => $director->fecha_nacimiento->format('Y-m-d'),
             'nacionalidad' => $director->nacionalidad,
+            'foto' => $director->url_imagen,
             'peliculas' => $director->peliculas->pluck('titulo'),
         ];
 
@@ -59,6 +61,7 @@ class controladorDirectores extends Controller{
             'nombre' => 'required|string|max:255|unique:directores,nombre',
             'fecha_nacimiento' => 'required|date_format:Y-m-d',
             'nacionalidad' => 'required|string|max:255',
+            'foto' => 'nullable|string',
         ]);
 
         if($validator->fails()){
@@ -75,6 +78,7 @@ class controladorDirectores extends Controller{
             'nombre' => $request->nombre,
             'fecha_nacimiento' => $request->fecha_nacimiento,
             'nacionalidad' => $request->nacionalidad,
+            'url_imagen' => $request->foto,
         ]);
         
         if(!$director){
@@ -105,6 +109,7 @@ class controladorDirectores extends Controller{
             'nombre' => 'string|max:255|unique:directores,nombre',
             'fecha_nacimiento' => 'date_format:Y-m-d',
             'nacionalidad' => 'string|max:255',
+            'foto' => 'nullable|string',
         ]);
 
         if($validator->fails()){
@@ -121,7 +126,7 @@ class controladorDirectores extends Controller{
 
         if(!$director){
             $data = [
-                'message' => 'Error al crear el director',
+                'message' => 'Error al actualizar el director',
                 'status' => 500,
             ];
 

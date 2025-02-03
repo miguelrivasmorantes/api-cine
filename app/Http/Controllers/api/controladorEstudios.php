@@ -15,6 +15,7 @@ class controladorEstudios extends Controller{
                 'nombre' => $estudio->nombre,
                 'pais' => $estudio->pais,
                 'fundacion' => $estudio->fundacion->format('Y-m-d'),
+                'logo' => $estudio->url_logo,
             ];
         });
 
@@ -42,6 +43,7 @@ class controladorEstudios extends Controller{
             'nombre' => $estudio->nombre,
             'pais' => $estudio->pais,
             'fundacion' => $estudio->fundacion->format('Y-m-d'),
+            'logo' => $estudio->url_logo,
             'peliculas' => $estudio->peliculas->pluck('titulo'),
         ];
 
@@ -59,6 +61,7 @@ class controladorEstudios extends Controller{
             'nombre' => 'required|string|max:255|unique:estudios,nombre',
             'pais' => 'required|string|max:255',
             'fundacion' => 'required|date_format:Y-m-d',
+            'logo' => 'nullable|string',
         ]);
 
         if($validator->fails()){
@@ -75,6 +78,7 @@ class controladorEstudios extends Controller{
             'nombre' => $request->nombre,
             'pais' => $request->pais,
             'fundacion' => $request->fundacion,
+            'url_logo' => $request->logo,
         ]);
 
         if(!$estudio){
@@ -105,6 +109,7 @@ class controladorEstudios extends Controller{
             'nombre' => 'string|max:255|unique:estudios,nombre',
             'pais' => 'string|max:255',
             'fundacion' => 'date_format:Y-m-d',
+            'logo' => 'nullable|string',
         ]);
 
         if($validator->fails()){
@@ -121,7 +126,7 @@ class controladorEstudios extends Controller{
 
         if(!$estudio){
             $data = [
-                'message' => 'Error al crear el estudio',
+                'message' => 'Error al actualizar el estudio',
                 'status' => 500,
             ];
 

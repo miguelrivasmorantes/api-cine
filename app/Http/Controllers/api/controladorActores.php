@@ -15,6 +15,7 @@ class controladorActores extends Controller{
                 'nombre' => $actor->nombre,
                 'fecha_nacimiento' => $actor->fecha_nacimiento->format('Y-m-d'),
                 'nacionalidad' => $actor->nacionalidad,
+                'foto' => $actor->url_imagen,
             ];
         });
 
@@ -42,6 +43,7 @@ class controladorActores extends Controller{
             'nombre' => $actor->nombre,
             'fecha_nacimiento' => $actor->fecha_nacimiento->format('Y-m-d'),
             'nacionalidad' => $actor->nacionalidad,
+            'foto' => $actor->url_imagen,
             'peliculas' => $actor->peliculas->pluck('titulo'),
         ];
 
@@ -59,6 +61,7 @@ class controladorActores extends Controller{
             'nombre' => 'required|string|max:255|unique:actores,nombre',
             'fecha_nacimiento' => 'required|date_format:Y-m-d',
             'nacionalidad' => 'required|string|max:255',
+            'foto' => 'nullable|string',
         ]);
 
         if($validator->fails()){
@@ -75,6 +78,7 @@ class controladorActores extends Controller{
             'nombre' => $request->nombre,
             'fecha_nacimiento' => $request->fecha_nacimiento,
             'nacionalidad' => $request->nacionalidad,
+            'url_imagen' => $request->foto,
         ]);
         
         if(!$actor){
@@ -105,6 +109,7 @@ class controladorActores extends Controller{
             'nombre' => 'string|max:255|unique:actores,nombre',
             'fecha_nacimiento' => 'date_format:Y-m-d',
             'nacionalidad' => 'string|max:255',
+            'foto' => 'nullable|string',
         ]);
 
         if($validator->fails()){
