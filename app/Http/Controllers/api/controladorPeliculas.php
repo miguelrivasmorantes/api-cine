@@ -14,257 +14,266 @@ use App\Models\Poster;
 
 class controladorPeliculas extends Controller
 {
-    public function index(){
-        $peliculas = Pelicula::with('estudio', 'director', 'generos', 'actores', 'posters')->get()->map(function($pelicula) {
-            return [
-                'id' => $pelicula->id,
-                'titulo' => $pelicula->titulo,
-                'estreno' => $pelicula->estreno->format('Y-m-d'),
-                'taquilla' => $pelicula->taquilla,
-                'pais' => $pelicula->pais,
-                'estudio' => $pelicula->estudio->nombre,
-                'director' => $pelicula->director->nombre,
-                'generos' => $pelicula->generos->pluck('nombre'),
-                'actores' => $pelicula->actores->pluck('nombre'),
-                'posters' => $pelicula->posters->pluck('url'),
-            ];
-        });
+	public function index(Request $request){
 
-        if (!$peliculas) {
-            return response()->json(['message' => 'No se encontraron peliculas', 'status' => 200]);
-        }
+		$ordenAlfabetico = $request->input('ordenAlfabetico'); //poner orden por defecto
+		$ordenEstreno = $request->input('ordenEstreno');
+		$ordenTaquilla = $request->input('ordenTaquilla');
+		$titulo = $request->input('titulo');
+		$director = $request->input('director');
+		$generos = $request->input('generos', []);
+		$actores = $request->input('actores', []);
+		$taquilla = $request->input('taquilla');
+		$estreno = $request->input('estreno');
+		$estudio = $request->input('estudio');
+		$pais = $request->input('pais');
 
-        $data = [
-            'peliculas' => $peliculas,
-            'status' => 200,
-        ];
-    
-        return $data;
-    }    
+		$peliculas = Pelicula::
+				with('estudio', 'director', 'generos', 'actores', 'posters')->
+				when($titulo, function ($q) use ($titulo) {$q->where('titulo', 'like', "%{$titulo}%");})->
+				when($director, fn($q) => $q->whereHas('director', fn($q) => $q->where('nombre', 'like', "%{$director}%")))->
+				when($generos, function ($q) use ($generos) {
+					foreach ((array) $generos as $genero) {
+						$q->whereHas('generos', function ($q) use ($genero) {
+							$q->where('nombre', 'like', "%{$genero}%");
+						});
+					}
+				})->
+				when($actores, function ($q) use ($actores) {
+					foreach ((array) $actores as $actor) {
+						$q->whereHas('actores', function ($q) use ($actor) {
+							$q->where('nombre', 'like', "%{$actor}%");
+						});
+					}
+				})->
+				when($taquilla, function ($q) use ($taquilla) {$q->where('taquilla', 'like', "%{$taquilla}%");})-> //Cambiar a intervalo de dinero
+				when($estreno, function ($q) use ($estreno) {$q->where('estreno', 'like', "%{$estreno}%");})-> //Cambiar a intervalo de tiempo		when($estudio, fn($q) => $q->whereHas('estudio', fn($q) => $q->where('nombre', 'like', "%{$estudio}%")))->
+	            when($pais, function ($q) use ($pais) {$q->where('pais', 'like', "%{$pais}%");})->
+				get()->
+				map(function ($pelicula) {
+			return [
+				'id' => $pelicula->id,
+				'titulo' => $pelicula->titulo,
+				'estreno' => $pelicula->estreno->format('Y-m-d'),
+				'taquilla' => $pelicula->taquilla,
+				'pais' => $pelicula->pais,
+				'estudio' => $pelicula->estudio->nombre,
+				'director' => $pelicula->director->nombre,
+				'generos' => $pelicula->generos->pluck('nombre'),
+				'actores' => $pelicula->actores->pluck('nombre'),
+				'posters' => $pelicula->posters->pluck('url'),
+			];
+		});
 
-    public function show($id){
-        $pelicula = Pelicula::with('estudio', 'director', 'generos', 'actores', 'posters')->find($id);
+		if (!$peliculas) {
+			return response()->json(['message' => 'No se encontraron peliculas', 'status' => 200]);
+		}
 
-        if (!$pelicula) {
-            return response()->json(['message' => 'Película no encontrada', 'status' => 200]);
-        }
+		if ($peliculas->isEmpty()) {
+			return response()->json(['message' => 'No se ha encontrado una pelicula con la información proporcionada', 'status' => 200]);
+		}
 
-        $pelicula = [
-            'id' => $pelicula->id,
-            'titulo' => $pelicula->titulo,
-            'estreno' => $pelicula->estreno->format('Y-m-d'),
-            'taquilla' => $pelicula->taquilla,
-            'pais' => $pelicula->pais,
-            'estudio' => $pelicula->estudio->nombre,
-            'director' => $pelicula->director->nombre,
-            'generos' => $pelicula->generos->pluck('nombre'),
-            'actores' => $pelicula->actores->pluck('nombre'),
-            'posters' => $pelicula->posters->pluck('url'),
-        ];
+		$data = [
+			'peliculas' => $peliculas,
+			'status' => 200,
+		];
+	
+		return $data;
+	}    
 
-        $data = [
-            'pelicula' => $pelicula,
-            'status' => 200,
-        ];
+	public function show($id){
+		$pelicula = Pelicula::with('estudio', 'director', 'generos', 'actores', 'posters')->find($id);
 
-        return $data;
-    }
+		if (!$pelicula) {
+			return response()->json(['message' => 'Película no encontrada', 'status' => 200]);
+		}
 
-    public function store(Request $request){
-        $validator = Validator::make($request->all(), [
-            'titulo' => 'required|string|max:255|unique:peliculas,titulo',
-            'estreno' => 'required|date_format:Y-m-d',
-            'taquilla' => 'sometimes|numeric',
-            'pais' => 'required|string|max:255',
-            'estudio' => 'required|string|max:255|exists:estudios,nombre',
-            'director' => 'required|string|max:255|exists:directores,nombre',
-            'generos' => 'required|array',
-            'generos.*' => 'required|string|max:255|exists:generos,nombre',
-            'actores' => 'required|array',
-            'actores.*' => 'required|string|max:255|exists:actores,nombre',
-            'posters' => 'required|array',
-            'posters.*' => 'required|string|url',
-        ]);
+		$pelicula = [
+			'id' => $pelicula->id,
+			'titulo' => $pelicula->titulo,
+			'estreno' => $pelicula->estreno->format('Y-m-d'),
+			'taquilla' => $pelicula->taquilla,
+			'pais' => $pelicula->pais,
+			'estudio' => $pelicula->estudio->nombre,
+			'director' => $pelicula->director->nombre,
+			'generos' => $pelicula->generos->pluck('nombre'),
+			'actores' => $pelicula->actores->pluck('nombre'),
+			'posters' => $pelicula->posters->pluck('url'),
+		];
 
-        if($validator->fails()){
-            $data = [
-                'message' => 'Error en la validación de los datos',
-                'errors' => $validator->errors(),
-                'status' => 400,
-            ];
+		$data = [
+			'pelicula' => $pelicula,
+			'status' => 200,
+		];
 
-            return $data;
-        }
+		return $data;
+	}
 
-        $director = Directore::where('nombre', $request->director)->first();
-        $estudio = Estudio::where('nombre', $request->estudio)->first();
+	public function store(Request $request){
+		$validator = Validator::make($request->all(), [
+			'titulo' => 'required|string|max:255|unique:peliculas,titulo',
+			'estreno' => 'required|date_format:Y-m-d',
+			'taquilla' => 'sometimes|numeric',
+			'pais' => 'required|string|max:255',
+			'estudio' => 'required|string|max:255|exists:estudios,nombre',
+			'director' => 'required|string|max:255|exists:directores,nombre',
+			'generos' => 'required|array',
+			'generos.*' => 'required|string|max:255|exists:generos,nombre',
+			'actores' => 'required|array',
+			'actores.*' => 'required|string|max:255|exists:actores,nombre',
+			'posters' => 'required|array',
+			'posters.*' => 'required|string|url',
+		]);
 
-        $pelicula = Pelicula::create([
-            'titulo' => $request->titulo,
-            'estreno' => $request->estreno,
-            'taquilla' => $request->taquilla,
-            'pais' => $request->pais,
-            'id_estudio' => $estudio->id,
-            'id_director' => $director->id,
-            'actores' => $request->actores,
-        ]);
+		if($validator->fails()){
+			$data = [
+				'message' => 'Error en la validación de los datos',
+				'errors' => $validator->errors(),
+				'status' => 400,
+			];
 
-        $generoId = Genero::whereIn('nombre', $request->generos)->pluck('id');
-        $pelicula->generos()->attach($generoId);
-        
-        $actorId = Actore::whereIn('nombre', $request->actores)->pluck('id');
-        $pelicula->actores()->attach($actorId);
+			return $data;
+		}
 
-        $posters = array_map(function ($url) use ($pelicula) {
-            return ['id_pelicula' => $pelicula->id, 'url' => $url];
-        }, $request->posters);
+		$director = Directore::where('nombre', $request->director)->first();
+		$estudio = Estudio::where('nombre', $request->estudio)->first();
 
-        Poster::insert($posters);
+		$pelicula = Pelicula::create([
+			'titulo' => $request->titulo,
+			'estreno' => $request->estreno,
+			'taquilla' => $request->taquilla,
+			'pais' => $request->pais,
+			'id_estudio' => $estudio->id,
+			'id_director' => $director->id,
+			'actores' => $request->actores,
+		]);
 
-        if(!$pelicula){
-            $data = [
-                'message' => 'Error al crear la película',
-                'status' => 500,
-            ];
+		$generoId = Genero::whereIn('nombre', $request->generos)->pluck('id');
+		$pelicula->generos()->attach($generoId);
+		
+		$actorId = Actore::whereIn('nombre', $request->actores)->pluck('id');
+		$pelicula->actores()->attach($actorId);
 
-            return $data;
-        }
+		$posters = array_map(function ($url) use ($pelicula) {
+			return ['id_pelicula' => $pelicula->id, 'url' => $url];
+		}, $request->posters);
 
-        $data = [
-            'pelicula' => $pelicula,
-            'status' => 201
-        ];
+		Poster::insert($posters);
 
-        return $data;
-    }
+		if(!$pelicula){
+			$data = [
+				'message' => 'Error al crear la película',
+				'status' => 500,
+			];
 
-    public function update(Request $request, $id){
-        $pelicula = Pelicula::find($id);
+			return $data;
+		}
 
-        if (!$pelicula) {
-            return response()->json(['message' => 'Película no encontrada', 'status' => 200]);
-        }
+		$data = [
+			'pelicula' => $pelicula,
+			'status' => 201
+		];
 
-        $validator = Validator::make($request->all(), [
-            'titulo' => 'string|max:255|unique:peliculas,titulo',
-            'estreno' => 'date_format:Y-m-d',
-            'taquilla' => 'numeric',
-            'pais' => 'string|max:255',
-            'estudio' => 'string|max:255|exists:estudios,nombre',
-            'director' => 'string|max:255|exists:directores,nombre',
-            'generos' => 'array',
-            'generos.*' => 'string|max:255|exists:generos,nombre',
-            'actores' => 'array',
-            'actores.*' => 'string|max:255|exists:actores,nombre',
-            'posters' => 'array',
-            'posters.*' => 'string|url',
-        ]);
+		return $data;
+	}
 
-        if($validator->fails()){
-            $data = [
-                'message' => 'Error en la validación de los datos',
-                'errors' => $validator->errors(),
-                'status' => 400,
-            ];
+	public function update(Request $request, $id){
+		$pelicula = Pelicula::find($id);
 
-            return $data;
-        }
+		if (!$pelicula) {
+			return response()->json(['message' => 'Película no encontrada', 'status' => 200]);
+		}
 
-        if ($request->has('director')) {
-            $pelicula['id_director'] = Directore::where('nombre', $request->director)->value('id');
-        }
-        if ($request->has('estudio')) {
-            $pelicula['id_estudio'] = Estudio::where('nombre', $request->estudio)->value('id');
-        }
+		$validator = Validator::make($request->all(), [
+			'titulo' => 'string|max:255|unique:peliculas,titulo',
+			'estreno' => 'date_format:Y-m-d',
+			'taquilla' => 'numeric',
+			'pais' => 'string|max:255',
+			'estudio' => 'string|max:255|exists:estudios,nombre',
+			'director' => 'string|max:255|exists:directores,nombre',
+			'generos' => 'array',
+			'generos.*' => 'string|max:255|exists:generos,nombre',
+			'actores' => 'array',
+			'actores.*' => 'string|max:255|exists:actores,nombre',
+			'posters' => 'array',
+			'posters.*' => 'string|url',
+		]);
 
-        $pelicula->fill($request->all());
+		if($validator->fails()){
+			$data = [
+				'message' => 'Error en la validación de los datos',
+				'errors' => $validator->errors(),
+				'status' => 400,
+			];
 
-        if(!$pelicula){
-            $data = [
-                'message' => 'Error al actualizar la pelicula',
-                'status' => 500,
-            ];
+			return $data;
+		}
 
-            return $data;
-        }
+		if ($request->has('director')) {
+			$pelicula['id_director'] = Directore::where('nombre', $request->director)->value('id');
+		}
+		if ($request->has('estudio')) {
+			$pelicula['id_estudio'] = Estudio::where('nombre', $request->estudio)->value('id');
+		}
 
-        $pelicula->save();
+		$pelicula->fill($request->all());
 
-        if ($request->has('generos')) {
-            $generoId = Genero::whereIn('nombre', $request->generos)->pluck('id')->toArray();
-            $pelicula->generos()->sync($generoId);
-        }
+		if(!$pelicula){
+			$data = [
+				'message' => 'Error al actualizar la pelicula',
+				'status' => 500,
+			];
 
-        if ($request->has('actores')) {
-            $actorId = Actore::whereIn('nombre', $request->actores)->pluck('id')->toArray();
-            $pelicula->actores()->sync($actorId);
-        }
+			return $data;
+		}
 
-        if ($request->has('posters')) {
-            Poster::where('id_pelicula', $pelicula->id)->delete();
-            $posters = array_map(function ($url) use ($pelicula) {
-                return ['id_pelicula' => $pelicula->id, 'url' => $url];
-            }, $request->posters);
+		$pelicula->save();
 
-            Poster::insert($posters);
-        }
+		if ($request->has('generos')) {
+			$generoId = Genero::whereIn('nombre', $request->generos)->pluck('id')->toArray();
+			$pelicula->generos()->sync($generoId);
+		}
 
-        $data = [
-          'pelicula' => $pelicula,
-          'status' => 202,  
-        ];
+		if ($request->has('actores')) {
+			$actorId = Actore::whereIn('nombre', $request->actores)->pluck('id')->toArray();
+			$pelicula->actores()->sync($actorId);
+		}
 
-        return $data;
-    }
+		if ($request->has('posters')) {
+			Poster::where('id_pelicula', $pelicula->id)->delete();
+			$posters = array_map(function ($url) use ($pelicula) {
+				return ['id_pelicula' => $pelicula->id, 'url' => $url];
+			}, $request->posters);
 
-    public function destroy($id){
-        $pelicula = Pelicula::find($id);
+			Poster::insert($posters);
+		}
 
-        if (!$pelicula) {
-            return response()->json(['message' => 'Película no encontrada', 'status' => 200]);
-        }
+		$data = [
+		  'pelicula' => $pelicula,
+		  'status' => 202,  
+		];
 
-        $pelicula->actores()->detach();
-        $pelicula->generos()->detach();
-        $pelicula->posters()->delete();
+		return $data;
+	}
 
-        $pelicula->delete();
+	public function destroy($id){
+		$pelicula = Pelicula::find($id);
 
-        $data = [
-            'message' => 'Pelicula eliminada',
-            'status' => 200,
-        ];
+		if (!$pelicula) {
+			return response()->json(['message' => 'Película no encontrada', 'status' => 200]);
+		}
 
-        return $data;
-    }
+		$pelicula->actores()->detach();
+		$pelicula->generos()->detach();
+		$pelicula->posters()->delete();
 
-    public function search(Request $request){
-        $query = $request->input('query');
+		$pelicula->delete();
 
-        $peliculas = Pelicula::where('titulo', 'like', "%{$query}%")->get()->map(function($pelicula) {
-            return [
-                'id' => $pelicula->id,
-                'titulo' => $pelicula->titulo,
-                'estreno' => $pelicula->estreno->format('Y-m-d'),
-                'taquilla' => $pelicula->taquilla,
-                'pais' => $pelicula->pais,
-                'estudio' => $pelicula->estudio->nombre,
-                'director' => $pelicula->director->nombre,
-                'generos' => $pelicula->generos->pluck('nombre'),
-                'actores' => $pelicula->actores->pluck('nombre'),
-                'posters' => $pelicula->posters->pluck('url'),
-            ];
-        });
+		$data = [
+			'message' => 'Pelicula eliminada',
+			'status' => 200,
+		];
 
-        if ($peliculas->isEmpty()) {
-            return response()->json(['message' => 'No se ha encontrado una pelicula con la información proporcionada', 'status' => 200]);
-        }
-
-        $data = [
-            'pelicula' => $peliculas,
-            'status' => 200,
-        ];
-
-        return $data;
-    }
+		return $data;
+	}
 }
