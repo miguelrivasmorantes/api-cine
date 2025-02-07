@@ -16,12 +16,13 @@ class controladorPeliculas extends Controller
 {
 	public function index(Request $request){
 
-		$perPage = $request->input('perPage', 10);
+		$perPage = $request->input('per_page', 10);
 		$page = $request->input('page', 1);
-		$ordenAlfabetico = $request->input('ordenAlfabetico');
-		$ordenEstreno = $request->input('ordenEstreno');
-		$ordenTaquilla = $request->input('ordenTaquilla');
+		$ordenAlfabetico = $request->input('orden_alfabetico');
+		$ordenEstreno = $request->input('orden_estreno');
+		$ordenTaquilla = $request->input('orden_taquilla');
 		$titulo = $request->input('titulo');
+		$tituloInicio = $request->input('titulo_inicio');
 		$director = $request->input('director');
 		$generos = $request->input('generos', []);
 		$actores = $request->input('actores', []);
@@ -36,7 +37,12 @@ class controladorPeliculas extends Controller
 		$peliculas = Pelicula::
 				with('estudio', 'director', 'generos', 'actores', 'posters')->
 				when($titulo, function ($q) use ($titulo) {$q->where('titulo', 'like', "%{$titulo}%");})->
-				when($director, fn($q) => $q->whereHas('director', fn($q) => $q->where('nombre', 'like', "%{$director}%")))->
+				when($tituloInicio, function ($q) use ($tituloInicio) {$q->where('titulo', 'like', "{$tituloInicio}%");})->
+				when($director, fn($q) => 
+					$q->whereHas('director', fn($q) => 
+						$q->whereRaw("CONCAT(nombre, ' ', apellido) LIKE ?", ["%{$director}%"])
+					)
+				)->
 				when($estudio, fn($q) => $q->whereHas('estudio', fn($q) => $q->where('nombre', 'like', "%{$director}%")))->
 				when($generos, function ($q) use ($generos) {
 					foreach ((array) $generos as $genero) {
@@ -47,9 +53,9 @@ class controladorPeliculas extends Controller
 				})->
 				when($actores, function ($q) use ($actores) {
 					foreach ((array) $actores as $actor) {
-						$q->whereHas('actores', function ($q) use ($actor) {
-							$q->where('nombre', 'like', "%{$actor}%");
-						});
+						$q->whereHas('actores', fn($q) => 
+							$q->whereRaw("CONCAT(nombre, ' ', apellido) LIKE ?", ["%{$actor}%"])
+						);
 					}
 				})->
 				when($taquillaInferior, function ($q) use ($taquillaInferior) {
@@ -84,9 +90,9 @@ class controladorPeliculas extends Controller
 				'taquilla' => $pelicula->taquilla,
 				'pais' => $pelicula->pais,
 				'estudio' => $pelicula->estudio->nombre,
-				'director' => $pelicula->director->nombre,
+				'director' => "{$pelicula->director->nombre} {$pelicula->director->apellido}",
 				'generos' => $pelicula->generos->pluck('nombre'),
-				'actores' => $pelicula->actores->pluck('nombre'),
+				'actores' => $pelicula->actores->map(fn($actor) => "{$actor->nombre} {$actor->apellido}"),
 				'posters' => $pelicula->posters->pluck('url'),
 			];
 		});
@@ -121,9 +127,9 @@ class controladorPeliculas extends Controller
 			'taquilla' => $pelicula->taquilla,
 			'pais' => $pelicula->pais,
 			'estudio' => $pelicula->estudio->nombre,
-			'director' => $pelicula->director->nombre,
+			'director' => "{$pelicula->director->nombre} {$pelicula->director->apellido}",
 			'generos' => $pelicula->generos->pluck('nombre'),
-			'actores' => $pelicula->actores->pluck('nombre'),
+			'actores' => $pelicula->actores->map(fn($actor) => "{$actor->nombre} {$actor->apellido}"),
 			'posters' => $pelicula->posters->pluck('url'),
 		];
 
@@ -142,11 +148,14 @@ class controladorPeliculas extends Controller
 			'taquilla' => 'sometimes|numeric',
 			'pais' => 'required|string|max:255',
 			'estudio' => 'required|string|max:255|exists:estudios,nombre',
-			'director' => 'required|string|max:255|exists:directores,nombre',
+			'director' => 'required|array',
+			'director.nombre' => 'required|string|max:255|exists:directores,nombre',
+			'director.apellido' => 'required|string|max:255|exists:directores,apellido',
 			'generos' => 'required|array',
 			'generos.*' => 'required|string|max:255|exists:generos,nombre',
 			'actores' => 'required|array',
-			'actores.*' => 'required|string|max:255|exists:actores,nombre',
+			'actores.*.nombre' => 'required|string|max:255|exists:actores,nombre',
+			'actores.*.apellido' => 'required|string|max:255|exists:actores,apellido',
 			'posters' => 'required|array',
 			'posters.*' => 'required|string|url',
 		]);
@@ -216,11 +225,14 @@ class controladorPeliculas extends Controller
 			'taquilla' => 'numeric',
 			'pais' => 'string|max:255',
 			'estudio' => 'string|max:255|exists:estudios,nombre',
-			'director' => 'string|max:255|exists:directores,nombre',
+			'director' => 'array',
+			'director.nombre' => 'string|max:255|exists:directores,nombre',
+			'director.apellido' => 'string|max:255|exists:directores,apellido',			
 			'generos' => 'array',
 			'generos.*' => 'string|max:255|exists:generos,nombre',
 			'actores' => 'array',
-			'actores.*' => 'string|max:255|exists:actores,nombre',
+			'actores.*.nombre' => 'string|max:255|exists:actores,nombre',
+			'actores.*.apellido' => 'string|max:255|exists:actores,apellido',
 			'posters' => 'array',
 			'posters.*' => 'string|url',
 		]);
