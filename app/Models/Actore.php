@@ -34,7 +34,8 @@ class Actore extends Model
 	protected $fillable = [
 		'nombre',
 		'fecha_nacimiento',
-		'nacionalidad'
+		'nacionalidad',
+		'url_imagen'
 	];
 
 	public function peliculas()
