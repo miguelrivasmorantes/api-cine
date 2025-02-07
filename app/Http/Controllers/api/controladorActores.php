@@ -158,7 +158,7 @@ class controladorActores extends Controller{
         }
 
         $validator = Validator::make($request->all(), [
-            'nombre' => 'string|max:255|unique:actores,nombre',
+            'nombre' => 'string|max:255',
             'apellido' => ['required|string|max:255',
                                 Rule::unique('actores')->where(fn($q) =>
                                     $q->where('nombre', $request->nombre)
