@@ -54,7 +54,7 @@ class Pelicula extends Model
 		return $this->belongsTo(Estudio::class, 'id_estudio');
 	}
 
-	public function directore()
+	public function director()
 	{
 		return $this->belongsTo(Directore::class, 'id_director');
 	}
@@ -67,5 +67,10 @@ class Pelicula extends Model
 	public function generos()
 	{
 		return $this->belongsToMany(Genero::class, 'pelicula_genero', 'id_pelicula', 'id_genero');
+	}
+
+	public function posters()
+	{
+    	return $this->hasMany(Poster::class, 'id_pelicula');
 	}
 }

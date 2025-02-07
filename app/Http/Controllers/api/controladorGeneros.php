@@ -8,12 +8,26 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Genero;
 
 class controladorGeneros extends Controller{
-    public function index(){
-        $generos = Genero::all()->map(function($genero){
-            return [
-                'id' => $genero->id,
-                'genero' => $genero->nombre,
-            ];
+    public function index(Request $request){
+
+        $perPage = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $ordenAlfabetico = $request->input('orden_alfabetico');
+        $nombre = $request->input('nombre');
+
+        $generos = Genero::
+            when($nombre, function ($q) use ($nombre) {$q->where('nombre', 'like', "%{$nombre}%");})->
+            when($ordenAlfabetico, function ($q) use ($ordenAlfabetico){
+                $q->orderBy('nombre', $ordenAlfabetico);
+            })->
+            orderBy('id', 'desc')->
+            paginate($perPage, ['*'], 'page', $page)->
+            map(function($genero){
+                return [
+                    'id' => $genero->id,
+                    'genero' => $genero->nombre,
+                    'imagen' => $genero->img,
+                ];
         });
 
         if(!$generos){
@@ -38,6 +52,7 @@ class controladorGeneros extends Controller{
         $genero = [
             'id' => $genero->id,
             'nombre' => $genero->nombre,
+            'imagen' => $genero->img,
             'peliculas' => $genero->peliculas->pluck('titulo'),
         ];
 
@@ -51,7 +66,8 @@ class controladorGeneros extends Controller{
 
     public function store(Request $request){
         $validator = Validator::make($request->all(), [
-            'genero' => 'required|string|max:255|unique:generos,nombre'
+            'genero' => 'required|string|max:255|unique:generos,nombre',
+            'imagen' => 'nullable|string|max:255',
         ]);
 
         if($validator->fails()){
@@ -66,6 +82,7 @@ class controladorGeneros extends Controller{
 
         $genero = Genero::create([
             'nombre' => $request->genero,
+            'imagen' => $request->img,
         ]);
 
         $data = [

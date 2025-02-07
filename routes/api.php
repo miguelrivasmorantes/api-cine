@@ -7,6 +7,7 @@ use App\Http\Controllers\api\controladorPeliculas;
 use App\Http\Controllers\api\controladorEstudios;
 use App\Http\Controllers\api\controladorGeneros;
 use App\Http\Controllers\api\controladorDirectores;
+use App\Http\Controllers\api\controladorActores;
 
 Route::get('/hola', function () {
     return 'Hola Mundo!!!';
@@ -18,6 +19,10 @@ Route::get('/peliculas', [controladorPeliculas::class, 'index']);
 Route::get('/peliculas/{id}', [controladorPeliculas::class, 'show']);
 
 Route::post('/peliculas', [controladorPeliculas::class, 'store']);
+
+Route::patch('/peliculas/{id}', [controladorPeliculas::class, 'update']);
+
+Route::delete('/peliculas/{id}', [controladorPeliculas::class, 'destroy']);
 // End: Operations for Películas
 
 
@@ -50,3 +55,13 @@ Route::post('/directores', [controladorDirectores::class, 'store']);
 
 Route::patch('/directores/{id}', [controladorDirectores::class, 'update']);
 // End: Operatios for Directores
+
+// Start: Operatios for Actores
+Route::get('/actores', [controladorActores::class, 'index']);
+
+Route::get('/actores/{id}', [controladorActores::class, 'show']);
+
+Route::post('/actores', [controladorActores::class, 'store']);
+
+Route::patch('/actores/{id}', [controladorActores::class, 'update']);
+// End: Operatios for Actores
