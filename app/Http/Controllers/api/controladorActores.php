@@ -21,6 +21,7 @@ class controladorActores extends Controller{
         $edadSuperior = $request->input('edad_superior');
         $edadInferior = $request->input('edad_inferior');
         $nacionalidad = $request->input('nacionalidad');
+        $peliculas = $request->input('peliculas', []);
         
 
         $actores = Actore::
@@ -28,6 +29,13 @@ class controladorActores extends Controller{
                 $q->whereRaw("CONCAT(nombre, ' ', apellido) LIKE ?", ["%{$nombre}%"]);
             })->
             when($nacionalidad, function ($q) use ($nacionalidad) {$q->where('nacionalidad', 'like', "%{$nacionalidad}%");})->
+            when($peliculas, function ($q) use ($peliculas) {
+                foreach ((array) $peliculas as $pelicula) {
+                    $q->whereHas('peliculas', fn($q) => 
+                        $q->where('titulo', 'LIKE', "%{$pelicula}%")
+                    );
+                }
+            })->                   
             when($edadInferior, function ($q) use ($edadInferior) {
                 $q->whereRaw("TIMESTAMPDIFF(YEAR, fecha_nacimiento, CURDATE()) >= ?", [$edadInferior]);
             })->
@@ -48,8 +56,7 @@ class controladorActores extends Controller{
             map(function($actor){
             return [
                 'id' => $actor->id,
-                'nombre' => $actor->nombre,
-                'apellido' => $actor->apellido,
+                'nombre' => "{$actor->nombre} {$actor->apellido}",
                 'fecha_nacimiento' => $actor->fecha_nacimiento->format('Y-m-d'),
                 'edad' => Carbon::parse($actor->fecha_nacimiento)->age,
                 'nacionalidad' => $actor->nacionalidad,
@@ -78,8 +85,7 @@ class controladorActores extends Controller{
 
         $actor = [
             'id' => $actor->id,
-            'nombre' => $actor->nombre,
-            'apellido' => $actor->apellido,
+            'nombre' => "{$actor->nombre} {$actor->apellido}",
             'fecha_nacimiento' => $actor->fecha_nacimiento->format('Y-m-d'),
             'edad' =>  $actor->edad,
             'nacionalidad' => $actor->nacionalidad,
