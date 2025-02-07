@@ -35,66 +35,66 @@ class controladorPeliculas extends Controller
 		$pais = $request->input('pais');
 
 		$peliculas = Pelicula::
-				with('estudio', 'director', 'generos', 'actores', 'posters')->
-				when($titulo, function ($q) use ($titulo) {$q->where('titulo', 'like', "%{$titulo}%");})->
-				when($tituloInicio, function ($q) use ($tituloInicio) {$q->where('titulo', 'like', "{$tituloInicio}%");})->
-				when($director, fn($q) => 
-					$q->whereHas('director', fn($q) => 
-						$q->whereRaw("CONCAT(nombre, ' ', apellido) LIKE ?", ["%{$director}%"])
-					)
-				)->
-				when($estudio, fn($q) => $q->whereHas('estudio', fn($q) => $q->where('nombre', 'like', "%{$director}%")))->
-				when($generos, function ($q) use ($generos) {
-					foreach ((array) $generos as $genero) {
-						$q->whereHas('generos', function ($q) use ($genero) {
-							$q->where('nombre', 'like', "%{$genero}%");
-						});
-					}
-				})->
-				when($actores, function ($q) use ($actores) {
-					foreach ((array) $actores as $actor) {
-						$q->whereHas('actores', fn($q) => 
-							$q->whereRaw("CONCAT(nombre, ' ', apellido) LIKE ?", ["%{$actor}%"])
-						);
-					}
-				})->
-				when($taquillaInferior, function ($q) use ($taquillaInferior) {
-					$q->where('taquilla', '>=', $taquillaInferior);
-				})->
-				when($taquillaSuperior, function ($q) use ($taquillaSuperior) {
-					$q->where('taquilla', '<=', $taquillaSuperior);
-				})->
-				when($estrenoInferior, function ($q) use ($estrenoInferior) {
-					$q->where('estreno', '>=', $estrenoInferior);
-				})->
-				when($estrenoSuperior, function ($q) use ($estrenoSuperior) {
-					$q->where('estreno', '<=', $estrenoSuperior);
-				})->
-	            when($pais, function ($q) use ($pais) {$q->where('pais', 'like', "%{$pais}%");})->
-				when($ordenAlfabetico, function ($q) use ($ordenAlfabetico){
-					$q->orderBy('titulo', $ordenAlfabetico);
-				})->
-				when($ordenEstreno, function ($q) use ($ordenEstreno){
-					$q->orderBy('estreno', $ordenEstreno);
-				})->
-				when($ordenTaquilla, function ($q) use ($ordenTaquilla){
-					$q->orderBy('taquilla', $ordenTaquilla);
-				})->
-				orderBy('id', 'desc')->
-				paginate($perPage, ['*'], 'page', $page)->
-				map(function ($pelicula) {
-			return [
-				'id' => $pelicula->id,
-				'titulo' => $pelicula->titulo,
-				'estreno' => $pelicula->estreno->format('Y-m-d'),
-				'taquilla' => $pelicula->taquilla,
-				'pais' => $pelicula->pais,
-				'estudio' => $pelicula->estudio->nombre,
-				'director' => "{$pelicula->director->nombre} {$pelicula->director->apellido}",
-				'generos' => $pelicula->generos->pluck('nombre'),
-				'actores' => $pelicula->actores->map(fn($actor) => "{$actor->nombre} {$actor->apellido}"),
-				'posters' => $pelicula->posters->pluck('url'),
-			];
+			with('estudio', 'director', 'generos', 'actores', 'posters')->
+			when($titulo, function ($q) use ($titulo) {$q->where('titulo', 'like', "%{$titulo}%");})->
+			when($tituloInicio, function ($q) use ($tituloInicio) {$q->where('titulo', 'like', "{$tituloInicio}%");})->
+			when($director, fn($q) => 
+				$q->whereHas('director', fn($q) => 
+					$q->whereRaw("CONCAT(nombre, ' ', apellido) LIKE ?", ["%{$director}%"])
+				)
+			)->
+			when($estudio, fn($q) => $q->whereHas('estudio', fn($q) => $q->where('nombre', 'like', "%{$director}%")))->
+			when($generos, function ($q) use ($generos) {
+				foreach ((array) $generos as $genero) {
+					$q->whereHas('generos', function ($q) use ($genero) {
+						$q->where('nombre', 'like', "%{$genero}%");
+					});
+				}
+			})->
+			when($actores, function ($q) use ($actores) {
+				foreach ((array) $actores as $actor) {
+					$q->whereHas('actores', fn($q) => 
+						$q->whereRaw("CONCAT(nombre, ' ', apellido) LIKE ?", ["%{$actor}%"])
+					);
+				}
+			})->
+			when($taquillaInferior, function ($q) use ($taquillaInferior) {
+				$q->where('taquilla', '>=', $taquillaInferior);
+			})->
+			when($taquillaSuperior, function ($q) use ($taquillaSuperior) {
+				$q->where('taquilla', '<=', $taquillaSuperior);
+			})->
+			when($estrenoInferior, function ($q) use ($estrenoInferior) {
+				$q->where('estreno', '>=', $estrenoInferior);
+			})->
+			when($estrenoSuperior, function ($q) use ($estrenoSuperior) {
+				$q->where('estreno', '<=', $estrenoSuperior);
+			})->
+			when($pais, function ($q) use ($pais) {$q->where('pais', 'like', "%{$pais}%");})->
+			when($ordenAlfabetico, function ($q) use ($ordenAlfabetico){
+				$q->orderBy('titulo', $ordenAlfabetico);
+			})->
+			when($ordenEstreno, function ($q) use ($ordenEstreno){
+				$q->orderBy('estreno', $ordenEstreno);
+			})->
+			when($ordenTaquilla, function ($q) use ($ordenTaquilla){
+				$q->orderBy('taquilla', $ordenTaquilla);
+			})->
+			orderBy('id', 'desc')->
+			paginate($perPage, ['*'], 'page', $page)->
+			map(function ($pelicula) {
+				return [
+					'id' => $pelicula->id,
+					'titulo' => $pelicula->titulo,
+					'estreno' => $pelicula->estreno->format('Y-m-d'),
+					'taquilla' => $pelicula->taquilla,
+					'pais' => $pelicula->pais,
+					'estudio' => $pelicula->estudio->nombre,
+					'director' => "{$pelicula->director->nombre} {$pelicula->director->apellido}",
+					'generos' => $pelicula->generos->pluck('nombre'),
+					'actores' => $pelicula->actores->map(fn($actor) => "{$actor->nombre} {$actor->apellido}"),
+					'posters' => $pelicula->posters->pluck('url'),
+				];
 		});
 
 		if (!$peliculas) {

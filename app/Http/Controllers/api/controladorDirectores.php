@@ -54,14 +54,14 @@ class controladorDirectores extends Controller{
             orderBy('id', 'desc')->
             paginate($perPage, ['*'], 'page', $page)->
             map(function($director){
-            return [
-                'id' => $director->id,
-                'nombre' => "{$director->nombre} {$director->apellido}",
-                'fecha_nacimiento' => $director->fecha_nacimiento->format('Y-m-d'),
-                'edad' => Carbon::parse($director->fecha_nacimiento)->age,
-                'nacionalidad' => $director->nacionalidad,
-                'foto' => $director->url_imagen,
-            ];
+                return [
+                    'id' => $director->id,
+                    'nombre' => "{$director->nombre} {$director->apellido}",
+                    'fecha_nacimiento' => $director->fecha_nacimiento->format('Y-m-d'),
+                    'edad' => Carbon::parse($director->fecha_nacimiento)->age,
+                    'nacionalidad' => $director->nacionalidad,
+                    'foto' => $director->url_imagen,
+                ];
         });
 
         if(!$directores){

@@ -54,14 +54,14 @@ class controladorActores extends Controller{
             orderBy('id', 'desc')->
             paginate($perPage, ['*'], 'page', $page)->
             map(function($actor){
-            return [
-                'id' => $actor->id,
-                'nombre' => "{$actor->nombre} {$actor->apellido}",
-                'fecha_nacimiento' => $actor->fecha_nacimiento->format('Y-m-d'),
-                'edad' => Carbon::parse($actor->fecha_nacimiento)->age,
-                'nacionalidad' => $actor->nacionalidad,
-                'foto' => $actor->url_imagen,
-            ];
+                return [
+                    'id' => $actor->id,
+                    'nombre' => "{$actor->nombre} {$actor->apellido}",
+                    'fecha_nacimiento' => $actor->fecha_nacimiento->format('Y-m-d'),
+                    'edad' => Carbon::parse($actor->fecha_nacimiento)->age,
+                    'nacionalidad' => $actor->nacionalidad,
+                    'foto' => $actor->url_imagen,
+                ];
         });
 
         if(!$actores){

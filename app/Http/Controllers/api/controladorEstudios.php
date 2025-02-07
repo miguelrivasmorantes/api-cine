@@ -37,13 +37,13 @@ class controladorEstudios extends Controller{
             orderBy('id', 'desc')->
             paginate($perPage, ['*'], 'page', $page)->
             map(function($estudio){
-            return [
-                'id' => $estudio->id,
-                'nombre' => $estudio->nombre,
-                'pais' => $estudio->pais,
-                'fundacion' => $estudio->fundacion->format('Y-m-d'),
-                'logo' => $estudio->url_logo,
-            ];
+                return [
+                    'id' => $estudio->id,
+                    'nombre' => $estudio->nombre,
+                    'pais' => $estudio->pais,
+                    'fundacion' => $estudio->fundacion->format('Y-m-d'),
+                    'logo' => $estudio->url_logo,
+                ];
         });
 
         if(!$estudios){
