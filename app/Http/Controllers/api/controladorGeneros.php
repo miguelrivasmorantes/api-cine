@@ -8,13 +8,26 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Genero;
 
 class controladorGeneros extends Controller{
-    public function index(){
-        $generos = Genero::all()->map(function($genero){
-            return [
-                'id' => $genero->id,
-                'genero' => $genero->nombre,
-                'imagen' => $genero->img,
-            ];
+    public function index(Request $request){
+
+        $perPage = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $ordenAlfabetico = $request->input('orden_alfabetico');
+        $nombre = $request->input('nombre');
+
+        $generos = Genero::
+            when($nombre, function ($q) use ($nombre) {$q->where('nombre', 'like', "%{$nombre}%");})->
+            when($ordenAlfabetico, function ($q) use ($ordenAlfabetico){
+                $q->orderBy('nombre', $ordenAlfabetico);
+            })->
+            orderBy('id', 'desc')->
+            paginate($perPage, ['*'], 'page', $page)->
+            map(function($genero){
+                return [
+                    'id' => $genero->id,
+                    'genero' => $genero->nombre,
+                    'imagen' => $genero->img,
+                ];
         });
 
         if(!$generos){
