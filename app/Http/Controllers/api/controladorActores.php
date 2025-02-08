@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 use App\Models\Actore;
+use App\Models\Pelicula;
 
 class controladorActores extends Controller{
     public function index(Request $request){
@@ -199,4 +200,36 @@ class controladorActores extends Controller{
 
         return $data;
     }
+
+    public function filtersData()
+    {
+        $nacionalidades = Actore::distinct()->pluck('nacionalidad');
+        $peliculas = Pelicula::pluck('titulo');
+    
+        $edadInferior = Actore::selectRaw("TIMESTAMPDIFF(YEAR, fecha_nacimiento, CURDATE()) as edad")
+            ->orderBy('edad', 'asc')
+            ->first()?->edad;
+    
+        $edadSuperior = Actore::selectRaw("TIMESTAMPDIFF(YEAR, fecha_nacimiento, CURDATE()) as edad")
+            ->orderBy('edad', 'desc')
+            ->first()?->edad;
+    
+        $filtersData = [
+            'nacionalidades' => $nacionalidades,
+            'peliculas' => $peliculas,
+            'edad_inferior' => $edadInferior,
+            'edad_superior' => $edadSuperior,
+        ];
+    
+        if (!$filtersData) {
+            return response()->json(['message' => 'No se encontraron filtros', 'status' => 200]);
+        }
+
+        $data = [
+            'filters_data' => $filtersData,
+            'status' => 200
+        ];
+    
+        return $data;
+    }    
 }

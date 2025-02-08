@@ -20,22 +20,13 @@ class controladorDirectores extends Controller{
         $nombre = $request->input('nombre');
         $edadSuperior = $request->input('edad_superior');
         $edadInferior = $request->input('edad_inferior');
-        $nacionalidad = $request->input('nacionalidad');
-        $peliculas = $request->input('peliculas', []);
-        
+        $nacionalidad = $request->input('nacionalidad');        
 
         $directores = Directore::
             when($nombre, function ($q) use ($nombre) {
                 $q->whereRaw("CONCAT(nombre, ' ', apellido) LIKE ?", ["%{$nombre}%"]);
             })->
-            when($nacionalidad, function ($q) use ($nacionalidad) {$q->where('nacionalidad', 'like', "%{$nacionalidad}%");})->
-            when($peliculas, function ($q) use ($peliculas) {
-                foreach ((array) $peliculas as $pelicula) {
-                    $q->whereHas('peliculas', fn($q) => 
-                        $q->where('titulo', 'LIKE', "%{$pelicula}%")
-                    );
-                }
-            })->                   
+            when($nacionalidad, function ($q) use ($nacionalidad) {$q->where('nacionalidad', 'like', "%{$nacionalidad}%");})->        
             when($edadInferior, function ($q) use ($edadInferior) {
                 $q->whereRaw("TIMESTAMPDIFF(YEAR, fecha_nacimiento, CURDATE()) >= ?", [$edadInferior]);
             })->
@@ -198,4 +189,34 @@ class controladorDirectores extends Controller{
 
         return $data;
     }
+
+    public function filtersData()
+    {
+        $nacionalidades = Directore::distinct()->pluck('nacionalidad');
+    
+        $edadInferior = Directore::selectRaw("TIMESTAMPDIFF(YEAR, fecha_nacimiento, CURDATE()) as edad")
+            ->orderBy('edad', 'asc')
+            ->first()?->edad;
+    
+        $edadSuperior = Directore::selectRaw("TIMESTAMPDIFF(YEAR, fecha_nacimiento, CURDATE()) as edad")
+            ->orderBy('edad', 'desc')
+            ->first()?->edad;
+    
+        $filtersData = [
+            'nacionalidades' => $nacionalidades,
+            'edad_inferior' => $edadInferior,
+            'edad_superior' => $edadSuperior,
+        ];
+    
+        if (!$filtersData) {
+            return response()->json(['message' => 'No se encontraron filtros', 'status' => 200]);
+        }
+
+        $data = [
+            'filters_data' => $filtersData,
+            'status' => 200
+        ];
+    
+        return $data;
+    }    
 }

@@ -43,7 +43,7 @@ class controladorPeliculas extends Controller
 					$q->whereRaw("CONCAT(nombre, ' ', apellido) LIKE ?", ["%{$director}%"])
 				)
 			)->
-			when($estudio, fn($q) => $q->whereHas('estudio', fn($q) => $q->where('nombre', 'like', "%{$director}%")))->
+			when($estudio, fn($q) => $q->whereHas('estudio', fn($q) => $q->where('nombre', 'like', "%{$estudio}%")))->
 			when($generos, function ($q) use ($generos) {
 				foreach ((array) $generos as $genero) {
 					$q->whereHas('generos', function ($q) use ($genero) {
@@ -314,4 +314,45 @@ class controladorPeliculas extends Controller
 
 		return $data;
 	}
+
+	public function filtersData()
+    {
+        $paises = Pelicula::distinct()->pluck('pais');
+		$estudios = Estudio::distinct()->pluck('nombre');
+    
+        $estrenoInferior = Pelicula::min('estreno');
+		$estrenoSuperior = Pelicula::max('estreno');
+
+		$taquillaInferior = Pelicula::min('taquilla');
+		$taquillaSuperior = Pelicula::max('taquilla');
+
+		$actores = Actore::selectRaw("CONCAT(nombre, ' ', apellido) as nombre_completo")->pluck('nombre_completo');
+
+		$directores = Directore::selectRaw("CONCAT(nombre, ' ', apellido) as nombre_completo")->pluck('nombre_completo');
+
+		$generos = Genero::pluck('nombre');
+    
+        $filtersData = [
+            'paises' => $paises,
+            'estudios' => $estudios,
+            'estreno_inferior' => $estrenoInferior,
+            'estreno_superior' => $estrenoSuperior,
+			'taquilla_inferior' => $taquillaInferior,
+            'taquilla_superior' => $taquillaSuperior,
+			'actores' => $actores,
+			'directores' => $directores,
+			'generos' => $generos,
+        ];
+    
+        if (!$filtersData) {
+            return response()->json(['message' => 'No se encontraron filtros', 'status' => 200]);
+        }
+
+        $data = [
+            'filters_data' => $filtersData,
+            'status' => 200
+        ];
+    
+        return $data;
+    }
 }

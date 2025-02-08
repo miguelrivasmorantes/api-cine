@@ -15,18 +15,18 @@ class controladorEstudios extends Controller{
         $ordenAlfabetico = $request->input('orden_alfabetico');
         $ordenAntiguedad = $request->input('orden_antiguedad');
         $nombre = $request->input('nombre');
-        $AntiguedadSuperior = $request->input('antiguedad_superior');
-        $AntiguedadInferior = $request->input('antiguedad_inferior');
+        $antiguedadSuperior = $request->input('antiguedad_superior');
+        $antiguedadInferior = $request->input('antiguedad_inferior');
         $pais = $request->input('pais');
 
         $estudios = Estudio::
             when($nombre, function ($q) use ($nombre) {$q->where('nombre', 'like', "%{$nombre}%");})->
             when($pais, function ($q) use ($pais) {$q->where('pais', 'like', "%{$pais}%");})->               
-            when($AntiguedadInferior, function ($q) use ($AntiguedadInferior) {
-                $q->whereRaw("TIMESTAMPDIFF(YEAR, fundacion, CURDATE()) >= ?", [$AntiguedadInferior]);
+            when($antiguedadInferior, function ($q) use ($antiguedadInferior) {
+                $q->whereRaw("TIMESTAMPDIFF(YEAR, fundacion, CURDATE()) >= ?", [$antiguedadInferior]);
             })->
-            when($AntiguedadSuperior, function ($q) use ($AntiguedadSuperior) {
-                $q->whereRaw("TIMESTAMPDIFF(YEAR, fundacion, CURDATE()) <= ?", [$AntiguedadSuperior]);
+            when($antiguedadSuperior, function ($q) use ($antiguedadSuperior) {
+                $q->whereRaw("TIMESTAMPDIFF(YEAR, fundacion, CURDATE()) <= ?", [$antiguedadSuperior]);
             })->
             when($ordenAlfabetico, function ($q) use ($ordenAlfabetico){
                 $q->orderBy('nombre', $ordenAlfabetico);
@@ -169,4 +169,34 @@ class controladorEstudios extends Controller{
 
         return $data;
     }
+
+    public function filtersData()
+    {
+        $paises = Estudio::distinct()->pluck('pais');
+    
+        $antiguedadInferior = Estudio::selectRaw("TIMESTAMPDIFF(YEAR, fundacion, CURDATE()) as antiguedad")
+            ->orderBy('antiguedad', 'asc')
+            ->first()?->antiguedad;
+
+        $antiguedadSuperior = Estudio::selectRaw("TIMESTAMPDIFF(YEAR, fundacion, CURDATE()) as antiguedad")
+            ->orderBy('antiguedad', 'desc')
+            ->first()?->antiguedad;
+    
+        $filtersData = [
+            'paises' => $paises,
+            'antiguedad_inferior' => $antiguedadInferior,
+            'antiguedad_superior' => $antiguedadSuperior,
+        ];
+    
+        if (!$filtersData) {
+            return response()->json(['message' => 'No se encontraron filtros', 'status' => 200]);
+        }
+
+        $data = [
+            'filters_data' => $filtersData,
+            'status' => 200
+        ];
+    
+        return $data;
+    }    
 }
