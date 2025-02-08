@@ -94,6 +94,7 @@ class controladorPeliculas extends Controller
 					'generos' => $pelicula->generos->pluck('nombre'),
 					'actores' => $pelicula->actores->map(fn($actor) => "{$actor->nombre} {$actor->apellido}"),
 					'posters' => $pelicula->posters->pluck('url'),
+					'sinopsis' => $pelicula->sinopsis,
 				];
 		});
 
@@ -131,6 +132,7 @@ class controladorPeliculas extends Controller
 			'generos' => $pelicula->generos->pluck('nombre'),
 			'actores' => $pelicula->actores->map(fn($actor) => "{$actor->nombre} {$actor->apellido}"),
 			'posters' => $pelicula->posters->pluck('url'),
+			'sinopsis' => $pelicula->sinopsis,
 		];
 
 		$data = [
@@ -158,6 +160,7 @@ class controladorPeliculas extends Controller
 			'actores.*.apellido' => 'required|string|max:255|exists:actores,apellido',
 			'posters' => 'required|array',
 			'posters.*' => 'required|string|url',
+			'sinopsis' => 'required|string|max:900',
 		]);
 
 		if($validator->fails()){
@@ -181,6 +184,7 @@ class controladorPeliculas extends Controller
 			'id_estudio' => $estudio->id,
 			'id_director' => $director->id,
 			'actores' => $request->actores,
+			'sinopsis' => $request->sinopsis,
 		]);
 
 		$generoId = Genero::whereIn('nombre', $request->generos)->pluck('id');
@@ -235,6 +239,7 @@ class controladorPeliculas extends Controller
 			'actores.*.apellido' => 'string|max:255|exists:actores,apellido',
 			'posters' => 'array',
 			'posters.*' => 'string|url',
+			'sinopsis' => 'string|max:900'
 		]);
 
 		if($validator->fails()){

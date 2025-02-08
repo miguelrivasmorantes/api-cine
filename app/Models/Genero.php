@@ -25,7 +25,8 @@ class Genero extends Model
 	public $timestamps = false;
 
 	protected $fillable = [
-		'nombre'
+		'nombre',
+		'img',
 	];
 
 	public function peliculas()

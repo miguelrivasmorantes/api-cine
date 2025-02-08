@@ -33,8 +33,10 @@ class Directore extends Model
 
 	protected $fillable = [
 		'nombre',
+		'apellido',
 		'fecha_nacimiento',
-		'nacionalidad'
+		'nacionalidad',
+		'url_imagen',
 	];
 
 	public function peliculas()

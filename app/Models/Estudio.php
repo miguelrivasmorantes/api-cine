@@ -34,7 +34,8 @@ class Estudio extends Model
 	protected $fillable = [
 		'nombre',
 		'pais',
-		'fundacion'
+		'fundacion',
+		'url_logo',
 	];
 
 	public function peliculas()

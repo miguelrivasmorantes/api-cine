@@ -46,7 +46,8 @@ class Pelicula extends Model
 		'taquilla',
 		'pais',
 		'id_estudio',
-		'id_director'
+		'id_director',
+		'sinopsis',
 	];
 
 	public function estudio()
