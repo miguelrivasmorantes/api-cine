@@ -36,7 +36,10 @@ class controladorPeliculas extends Controller
 
 		$peliculas = Pelicula::
 			with('estudio', 'director', 'generos', 'actores', 'posters')->
-			when($titulo, function ($q) use ($titulo) {$q->where('titulo', 'like', "%{$titulo}%");})->
+			when($titulo, function ($q) use ($titulo) {
+				$q->where('titulo', 'like', "%{$titulo}%")
+				  ->orderByRaw("titulo LIKE ? DESC", ["{$titulo}%"]);
+			})->
 			when($tituloInicio, function ($q) use ($tituloInicio) {$q->where('titulo', 'like', "{$tituloInicio}%");})->
 			when($director, fn($q) => 
 				$q->whereHas('director', fn($q) => 
