@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('generos', function (Blueprint $table) {
+        Schema::create('estudios', function (Blueprint $table) {
             $table->integer('id', true);
-            $table->string('nombre', 100);
+            $table->string('nombre');
+            $table->string('pais', 100)->nullable();
+            $table->date('fundacion')->nullable();
+            $table->string('url_logo', 510)->nullable();
         });
     }
 
@@ -22,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('generos');
+        Schema::dropIfExists('estudios');
     }
 };

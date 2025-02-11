@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('estudios', function (Blueprint $table) {
-            $table->integer('id', true);
-            $table->string('nombre');
-            $table->string('pais', 100)->nullable();
-            $table->date('fundacion')->nullable();
+        Schema::table('posters', function (Blueprint $table) {
+            $table->foreign(['id_pelicula'], 'posters_ibfk_1')->references(['id'])->on('peliculas')->onUpdate('no action')->onDelete('no action');
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('estudios');
+        Schema::table('posters', function (Blueprint $table) {
+            $table->dropForeign('posters_ibfk_1');
+        });
     }
 };

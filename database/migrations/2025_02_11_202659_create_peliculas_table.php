@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('pais', 100)->nullable();
             $table->integer('id_estudio')->nullable()->index('id_estudio');
             $table->integer('id_director')->nullable()->index('id_director');
+            $table->string('sinopsis', 900)->nullable();
         });
     }
 
