@@ -124,6 +124,31 @@ INSERT INTO `generos` VALUES (1,'Acción','https://cdn2.iconfinder.com/data/icon
 UNLOCK TABLES;
 
 --
+-- Table structure for table `migrations`
+--
+
+DROP TABLE IF EXISTS `migrations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `migrations` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `batch` int NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `migrations`
+--
+
+LOCK TABLES `migrations` WRITE;
+/*!40000 ALTER TABLE `migrations` DISABLE KEYS */;
+INSERT INTO `migrations` VALUES (1,'2025_02_11_202659_create_actores_table',0),(2,'2025_02_11_202659_create_directores_table',0),(3,'2025_02_11_202659_create_estudios_table',0),(4,'2025_02_11_202659_create_generos_table',0),(5,'2025_02_11_202659_create_pelicula_actor_table',0),(6,'2025_02_11_202659_create_pelicula_genero_table',0),(7,'2025_02_11_202659_create_peliculas_table',0),(8,'2025_02_11_202659_create_posters_table',0),(9,'2025_02_11_202702_add_foreign_keys_to_pelicula_actor_table',0),(10,'2025_02_11_202702_add_foreign_keys_to_pelicula_genero_table',0),(11,'2025_02_11_202702_add_foreign_keys_to_peliculas_table',0),(12,'2025_02_11_202702_add_foreign_keys_to_posters_table',0),(13,'2025_02_12_192919_create_sessions_table',1);
+/*!40000 ALTER TABLE `migrations` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `pelicula_actor`
 --
 
@@ -192,6 +217,7 @@ CREATE TABLE `peliculas` (
   `pais` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `id_estudio` int DEFAULT NULL,
   `id_director` int DEFAULT NULL,
+  `sinopsis` varchar(900) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_estudio` (`id_estudio`),
   KEY `id_director` (`id_director`),
@@ -206,7 +232,7 @@ CREATE TABLE `peliculas` (
 
 LOCK TABLES `peliculas` WRITE;
 /*!40000 ALTER TABLE `peliculas` DISABLE KEYS */;
-INSERT INTO `peliculas` VALUES (1,'La La Land','2016-12-09',447407706.00,'Estados Unidos',2,6),(2,'Easy A','2010-09-17',74958816.00,'Estados Unidos',9,8),(3,'Titanic','1997-12-19',2201647264.00,'Estados Unidos',3,5),(4,'Inception','2010-07-16',836848102.00,'Estados Unidos',1,2),(5,'Pulp Fiction','1994-10-14',213928762.00,'Estados Unidos',2,3),(6,'The Notebook','2004-06-25',115603229.00,'Estados Unidos',7,19),(7,'Crazy, Stupid, Love','2011-07-29',142851197.00,'Estados Unidos',2,9),(8,'Pretty Woman','1990-03-23',463407268.00,'Estados Unidos',7,10),(9,'Notting Hill','1999-05-28',363889678.00,'Reino Unido',4,8),(10,'When Harry Met Sally','1989-07-21',92823546.00,'Estados Unidos',9,13),(11,'You’ve Got Mail','1998-12-18',250821495.00,'Estados Unidos',1,7),(12,'The Holiday','2006-12-08',205135000.00,'Estados Unidos',5,9),(13,'Bridget Jones\'s Diary','2001-04-13',281980000.00,'Reino Unido',7,9),(14,'Crazy Rich Asians','2018-08-15',238532921.00,'Estados Unidos',12,10),(15,'10 Things I Hate About You','1999-03-31',60381089.00,'Estados Unidos',6,9),(16,'500 Days of Summer','2009-07-17',60722134.00,'Estados Unidos',5,8),(17,'Silver Linings Playbook','2012-11-16',236412453.00,'Estados Unidos',4,15),(18,'To All the Boys I’ve Loved Before','2018-08-17',0.00,'Estados Unidos',18,20),(19,'Me Before You','2016-06-03',208314186.00,'Reino Unido',12,9),(20,'Love Actually','2003-11-14',246942017.00,'Reino Unido',6,8);
+INSERT INTO `peliculas` VALUES (1,'La La Land','2016-12-09',447407706.00,'Estados Unidos',2,6,'Sebastian, un pianista de jazz, y Mia, una aspirante a actriz, se enamoran locamente; pero la ambición desmedida que tienen por triunfar en sus respectivas carreras, en una ciudad como Los Ángeles, repleta de competencia y carente de piedad, pone en peligro su amor.'),(2,'Easy A','2010-09-17',74958816.00,'Estados Unidos',9,8,'La joven Olive ha sido objeto de una de las peores bromas que se puede sufrir en la escuela secundaria: alguien ha difundido el rumor de que ha perdido la virginidad; pero, tras el susto inicial, percibe que puede usar el bulo en su beneficio.'),(3,'Titanic','1997-12-19',2201647264.00,'Estados Unidos',3,5,'Una joven de la alta sociedad abandona a su arrogante pretendiente por un artista humilde en el trasatlántico que se hundió durante su viaje inaugural.'),(4,'Inception','2010-07-16',836848102.00,'Estados Unidos',1,2,'Dom Cobb es un ladrón con una extraña habilidad para entrar a los sueños de la gente y robarles los secretos de sus subconscientes. Su habilidad lo ha vuelto muy popular en el mundo del espionaje corporativo, pero ha tenido un gran costo en la gente que ama. Cobb obtiene la oportunidad de redimirse cuando recibe una tarea imposible: plantar una idea en la mente de una persona. Si tiene éxito, será el crimen perfecto, pero un enemigo se anticipa a sus movimientos.'),(5,'Pulp Fiction','1994-10-14',213928762.00,'Estados Unidos',2,3,'La vida de un boxeador, dos sicarios, la esposa de un gánster y dos bandidos se entrelaza en una historia de violencia y redención.'),(6,'The Notebook','2004-06-25',115603229.00,'Estados Unidos',7,19,'En un hogar de retiro un hombre le lee a una mujer, que sufre de Alzheimer, la historia de dos jóvenes de distintas clases sociales que se enamoraron durante la convulsionada década del 40, y de cómo fueron separados por terceros, y por la guerra.'),(7,'Crazy, Stupid, Love','2011-07-29',142851197.00,'Estados Unidos',2,9,'Cal Weaver está viviendo el sueño americano. Él tiene un buen trabajo, una casa preciosa, niños excelentes y una esposa hermosa, llamada Emily. Sin embargo, la aparente vida perfecta de Cal se derrumba cuando descubre que Emily le ha sido infiel y quiere divorciarse. Ahora, con más de 40 años, e inesperadamente soltero, Cal ingresa al vicioso mundo de las citas románticas. Jacob Palmer decide ayudar a Cal y le enseña a tener éxito con las damas.'),(8,'Pretty Woman','1990-03-23',463407268.00,'Estados Unidos',7,10,'Un empresario contrata a una prostituta hermosa para que sea su acompañante durante una semana de negocios en Beverly Hills.'),(9,'Notting Hill','1999-05-28',363889678.00,'Reino Unido',4,8,'Anna Scott, estrella de cine, y William Thacker, un hombre común, se conocen en un lugar llamado Notting Hill. Nace un inusitado romance, obstaculizado por el acecho de la prensa y las presiones que ejercen sus propias diferencias.'),(10,'When Harry Met Sally','1989-07-21',92823546.00,'Estados Unidos',9,13,'\nDos profesionales ambiciosos de Manhattan, quienes comienzan odiándose, tardan 12 años en enamorarse.'),(11,'You’ve Got Mail','1998-12-18',250821495.00,'Estados Unidos',1,7,'Los propietarios de dos librerías rivales no saben que están manteniendo un romance virtual entre ellos. Cuando descubren la verdad, deben evitar que su rivalidad comercial interfiera con su creciente intimidad personal.'),(12,'The Holiday','2006-12-08',205135000.00,'Estados Unidos',5,9,'Dos mujeres, una de Estados Unidos y la otra de Gran Bretaña, intercambian hogares durante la época navideña después de terminar con sus respectivos novios. Cada mujer se enamora de un hombre de la localidad, pero descubren que sus inminentes regresos a casa podrían poner fin a sus relaciones.'),(13,'Bridget Jones\'s Diary','2001-04-13',281980000.00,'Reino Unido',7,9,'Las crónicas diarias de una joven divertida, pero acomplejada, cuya vida sentimental está siempre en crisis; y que vive obsesionada con la idea de bajar de peso, dejar de fumar y conseguir novio.'),(14,'Crazy Rich Asians','2018-08-15',238532921.00,'Estados Unidos',12,10,'Rachel acompaña a Nick, su novio, a una boda en Singapur. En Asia, Rachel queda atónita cuando descubre que Nick es el heredero de una familia inmensamente rica, todas las jóvenes locales se lo quieren arrebatar y su madre desaprueba su relación.'),(15,'10 Things I Hate About You','1999-03-31',60381089.00,'Estados Unidos',6,9,'Las hermanas Stratford son muy distintas. La bella y popular Bianca nunca ha salido con un chico, pero lo está deseando, y Kat, su hermana mayor, es arisca y con mal genio. Su padre no deja que Bianca tenga novio hasta que Kat consiga uno.'),(16,'500 Days of Summer','2009-07-17',60722134.00,'Estados Unidos',5,8,'Tom, un escritor de tarjetas de felicitación y un romántico desesperado, se sorprende totalmente cuando su novia, Summer, repentinamente lo abandona. Él analiza los 500 días que pasaron juntos para intentar descubrir en que parte falló su relación amorosa y en el proceso, Tom redescubre sus verdaderas pasiones en la vida.'),(17,'Silver Linings Playbook','2012-11-16',236412453.00,'Estados Unidos',4,15,'Después de perder su casa, su trabajo, su esposa y pasar ocho meses en prisión, Pat Solatano termina viviendo con sus padres. Está decidido a reconstruir su vida y reunirse con su esposa. Sin embargo sus padres insisten en compartir su obsesión por los Philadelphia Eagles. Las cosas se complican cuando Pat conoce a Tiffany, que le ofrece ayuda para reencontrarse con su esposa si, a cambio, hace algo muy importante.'),(18,'To All the Boys I’ve Loved Before','2018-08-17',0.00,'Estados Unidos',18,20,'Lara Jean escribe cartas secretas y reveladoras a sus cinco enamorados, pero nunca tuvo la intención de enviarlas.'),(19,'Me Before You','2016-06-03',208314186.00,'Reino Unido',12,9,'La vida de Louisa Clark, una chica alegre y alocada, que va empalmando un trabajo con otro para ayudar a su familia a subsistir, cambia por completo cuando comienza a trabajar como cuidadora de un joven millonario, quien quedó paralítico tras un accidente. Poco a poco, se va estableciendo entre ellos una conexión cada vez más íntima.'),(20,'Love Actually','2003-11-14',246942017.00,'Reino Unido',6,8,'Las vidas de varias parejas se entrecruzan en Londres, poco antes de la Navidad, con resultados románticos, divertidos y agridulces.');
 /*!40000 ALTER TABLE `peliculas` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -236,6 +262,36 @@ LOCK TABLES `posters` WRITE;
 INSERT INTO `posters` VALUES (21,1,'https://media-cache.cinematerial.com/p/500x/unoktgtv/la-la-land-movie-poster.jpg?v=1472589717'),(22,1,'https://media-cache.cinematerial.com/p/500x/97blej9u/la-la-land-movie-poster.jpg?v=1485385477'),(23,2,'https://media-cache.cinematerial.com/p/500x/k3wytzyi/easy-a-movie-cover.jpg?v=1456775480'),(24,3,'https://media-cache.cinematerial.com/p/500x/zv8lstqd/titanic-movie-poster.jpg?v=1704644889'),(25,4,'https://cdn.cinematerial.com/p/136x/7uwb4va7/inception-movie-poster-sm.jpg?v=1456797089'),(26,5,'https://media-cache.cinematerial.com/p/500x/srmnoyxu/pulp-fiction-movie-poster.jpg?v=1668291848'),(27,6,'https://media-cache.cinematerial.com/p/500x/dpm18533/the-notebook-movie-poster.jpg?v=1542222904'),(28,7,'https://media-cache.cinematerial.com/p/500x/ehswn4xu/crazy-stupid-love-movie-poster.jpg?v=1456719391'),(29,8,'https://media-cache.cinematerial.com/p/500x/wg45dazz/pretty-woman-movie-poster.jpg?v=1500475362'),(30,9,'https://media-cache.cinematerial.com/p/500x/la3ndczu/notting-hill-movie-poster.jpg?v=1456294832'),(31,10,'https://media-cache.cinematerial.com/p/500x/ok36qxyk/when-harry-met-sally-movie-poster.jpg?v=1456292533'),(32,11,'https://media-cache.cinematerial.com/p/500x/qq3vsm6r/youve-got-mail-dvd-movie-cover.jpg?v=1456741031'),(33,12,'https://media-cache.cinematerial.com/p/500x/wf55ztco/the-holiday-movie-poster.jpg?v=1456819010'),(34,13,'https://media-cache.cinematerial.com/p/500x/sgxdi0lk/bridget-joness-diary-movie-poster.jpg?v=1456815944'),(35,14,'https://media-cache.cinematerial.com/p/500x/aqrsaifm/crazy-rich-asians-movie-poster.jpg?v=1536507321'),(36,15,'https://media-cache.cinematerial.com/p/500x/kuslonid/10-things-i-hate-about-you-movie-poster.jpg?v=1456036365'),(37,16,'https://media-cache.cinematerial.com/p/500x/87f9e7dz/500-days-of-summer-movie-poster.jpg?v=1456332437'),(38,17,'https://media-cache.cinematerial.com/p/500x/tj9qbixq/silver-linings-playbook-movie-poster.jpg?v=1456561108'),(39,18,'https://media-cache.cinematerial.com/p/500x/kj1asoku/to-all-the-boys-ive-loved-before-movie-poster.jpg?v=1532857913'),(40,19,'https://media-cache.cinematerial.com/p/500x/necnlbz6/me-before-you-movie-poster.jpg?v=1456062022'),(41,20,'https://media-cache.cinematerial.com/p/500x/ememh1wk/love-actually-british-movie-poster.jpg?v=1456180571');
 /*!40000 ALTER TABLE `posters` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `sessions`
+--
+
+DROP TABLE IF EXISTS `sessions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `sessions` (
+  `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` text COLLATE utf8mb4_unicode_ci,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `last_activity` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `sessions_user_id_index` (`user_id`),
+  KEY `sessions_last_activity_index` (`last_activity`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sessions`
+--
+
+LOCK TABLES `sessions` WRITE;
+/*!40000 ALTER TABLE `sessions` DISABLE KEYS */;
+INSERT INTO `sessions` VALUES ('vHec658j9883SHMVWkDVzIKwD4GoFQHNX2sae7A0',NULL,'127.0.0.1','Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiNENGcFR5d0c2Y2R4VnU5bG9ZTWVCQ3pUTDZPdUZDOU9JYVlsYkl0eiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1739388671),('WEG8vMfQBMjaHL2zC7AWZQEtrAnudT3CS1mL19Uy',NULL,'127.0.0.1','node','YTozOntzOjY6Il90b2tlbiI7czo0MDoibG8xcHpnQWxGOHB1dEtwSUlNUFZMbWtrcHNuVjBrZkQyMGNRU0swcSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1739388833),('WjWI5QXXiQ2U7p9JAGP5tZuepQncKQd3g7aYa9fr',NULL,'127.0.0.1','node','YTozOntzOjY6Il90b2tlbiI7czo0MDoiTERUaEpnaDU1emJjb1dYUXpRRnB2NEZlUVNib0FZanJucnNDSjBzSCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1739388887),('y2ptt8ljQSiKWys12bqi2dW0HIq3a1OIO8kRZzLu',NULL,'127.0.0.1','node','YTozOntzOjY6Il90b2tlbiI7czo0MDoia0VIQnZKTlhYbGRycnJYTGtKTVAwcURheUt1WlkzWTJZa2ZORzg4NSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1739388858);
+/*!40000 ALTER TABLE `sessions` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -246,4 +302,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-02-07 19:35:51
+-- Dump completed on 2025-02-18  0:12:41
