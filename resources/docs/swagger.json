@@ -1,0 +1,1701 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API de Cine",
+    "description": "API para gestionar películas, estudios, géneros, directores y actores.",
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "Películas",
+      "description": "Operaciones relacionadas con las películas"
+    },
+    {
+      "name": "Actores",
+      "description": "Operaciones relacionadas con los actores"
+    },
+    {
+      "name": "Directores",
+      "description": "Operaciones relacionadas con los directores"
+    },
+    {
+      "name": "Géneros",
+      "description": "Operaciones relacionadas con los géneros de las películas"
+    },
+    {
+      "name": "Estudios",
+      "description": "Operaciones relacionadas con los estudios de las películas"
+    }
+  ],
+  "paths": {
+    "/peliculas": {
+      "get": {
+        "tags": [
+          "Películas"
+        ],
+        "summary": "Obtener todas las películas con filtros y paginación",
+        "description": "Retorna una lista paginada de películas. Se pueden aplicar múltiples filtros: - Paginación: `per_page` (por defecto 10) y `page` (por defecto 1) - Ordenamientos: `orden_alfabetico`, `orden_estreno` y `orden_taquilla` (valores: `asc` o `desc`) - Filtros de contenido: `titulo`, `titulo_inicio`, `director`, `estudio`, `pais` - Filtros por rangos: `taquilla_inferior`, `taquilla_superior`, `estreno_inferior`, `estreno_superior` - Filtros múltiples (array): `generos` y `actores`\n",
+        "parameters": [
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Cantidad de resultados por página",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Número de página a retornar",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "orden_alfabetico",
+            "in": "query",
+            "description": "Orden alfabético para el título (asc/desc)",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "orden_estreno",
+            "in": "query",
+            "description": "Orden por fecha de estreno (asc/desc)",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "orden_taquilla",
+            "in": "query",
+            "description": "Orden por recaudación (asc/desc)",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "titulo",
+            "in": "query",
+            "description": "Filtro para buscar en el título de la película",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "titulo_inicio",
+            "in": "query",
+            "description": "Filtro para buscar películas cuyo título comience con un valor dado",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "director",
+            "in": "query",
+            "description": "Filtro para buscar por nombre (completo o parcial) del director",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "estudio",
+            "in": "query",
+            "description": "Filtro para buscar por nombre del estudio",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pais",
+            "in": "query",
+            "description": "Filtro para buscar por país de origen",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "generos",
+            "in": "query",
+            "description": "Filtro para buscar por géneros (se puede enviar varios valores)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "style": "form",
+            "explode": true
+          },
+          {
+            "name": "actores",
+            "in": "query",
+            "description": "Filtro para buscar por actores (se puede enviar varios valores)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "style": "form",
+            "explode": true
+          },
+          {
+            "name": "taquilla_inferior",
+            "in": "query",
+            "description": "Recaudación mínima en taquilla",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "taquilla_superior",
+            "in": "query",
+            "description": "Recaudación máxima en taquilla",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "estreno_inferior",
+            "in": "query",
+            "description": "Fecha mínima de estreno (formato YYYY-MM-DD)",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "estreno_superior",
+            "in": "query",
+            "description": "Fecha máxima de estreno (formato YYYY-MM-DD)",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "estreno",
+            "in": "query",
+            "description": "Fecha de estreno exacta (formato YYYY-MM-DD)",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de películas filtradas y paginadas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "peliculas": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PeliculaDetail"
+                      }
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Películas"
+        ],
+        "summary": "Crear una nueva película",
+        "description": "Crea una película registrando sus datos básicos, relaciones y recursos asociados.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "titulo": {
+                    "type": "string"
+                  },
+                  "estreno": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "taquilla": {
+                    "type": "number"
+                  },
+                  "pais": {
+                    "type": "string"
+                  },
+                  "estudio": {
+                    "type": "string"
+                  },
+                  "director": {
+                    "type": "object",
+                    "properties": {
+                      "nombre": {
+                        "type": "string"
+                      },
+                      "apellido": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "generos": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "actores": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "nombre": {
+                          "type": "string"
+                        },
+                        "apellido": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "posters": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  },
+                  "sinopsis": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "titulo",
+                  "estreno",
+                  "pais",
+                  "estudio",
+                  "director",
+                  "generos",
+                  "actores",
+                  "posters",
+                  "sinopsis"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Película creada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pelicula": {
+                      "$ref": "#/components/schemas/PeliculaDetail"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 201
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/peliculas/{id}": {
+      "get": {
+        "tags": [
+          "Películas"
+        ],
+        "summary": "Obtener detalles de una película",
+        "description": "Retorna la información completa de una película específica.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID de la película",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalles de la película",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pelicula": {
+                      "$ref": "#/components/schemas/PeliculaDetail"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Películas"
+        ],
+        "summary": "Actualizar detalles de una película",
+        "description": "Actualiza la información de una película. Todos los campos son opcionales.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID de la película a actualizar",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "titulo": {
+                    "type": "string"
+                  },
+                  "estreno": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "taquilla": {
+                    "type": "number"
+                  },
+                  "pais": {
+                    "type": "string"
+                  },
+                  "estudio": {
+                    "type": "string"
+                  },
+                  "director": {
+                    "type": "object",
+                    "properties": {
+                      "nombre": {
+                        "type": "string"
+                      },
+                      "apellido": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "generos": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "actores": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "nombre": {
+                          "type": "string"
+                        },
+                        "apellido": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "posters": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  },
+                  "sinopsis": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Película actualizada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pelicula": {
+                      "$ref": "#/components/schemas/PeliculaDetail"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 202
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/actores": {
+      "get": {
+        "tags": [
+          "Actores"
+        ],
+        "summary": "Obtener todos los actores con filtros y paginación",
+        "parameters": [
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Cantidad de resultados por página",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Número de página a retornar",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "nombre",
+            "in": "query",
+            "description": "Nombre o apellido del actor",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "edad_inferior",
+            "in": "query",
+            "description": "Edad mínima del actor",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "edad_superior",
+            "in": "query",
+            "description": "Edad máxima del actor",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "nacionalidad",
+            "in": "query",
+            "description": "Nacionalidad del actor",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de actores",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "actores": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ActoreDetail"
+                      }
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Actores"
+        ],
+        "summary": "Crear un nuevo actor",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActoreDetail"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Actor creado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "actor": {
+                      "$ref": "#/components/schemas/ActoreDetail"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 201
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/actores/{id}": {
+      "get": {
+        "tags": [
+          "Actores"
+        ],
+        "summary": "Obtener detalles de un actor",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID del actor",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalles del actor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "actor": {
+                      "$ref": "#/components/schemas/ActoreDetail"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Actores"
+        ],
+        "summary": "Actualizar un actor",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID del actor a actualizar",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActoreDetail"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Actor actualizado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "actor": {
+                      "$ref": "#/components/schemas/ActoreDetail"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 202
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/directores": {
+      "get": {
+        "tags": [
+          "Directores"
+        ],
+        "summary": "Obtener todos los directores con filtros y paginación",
+        "description": "Lista todos los directores con filtros por nombre, nacionalidad, edad y ordenamientos.",
+        "parameters": [
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Cantidad de resultados por página",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Número de página a retornar",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "orden_nombre",
+            "in": "query",
+            "description": "Ordenar por nombre (asc/desc)",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "orden_apellido",
+            "in": "query",
+            "description": "Ordenar por apellido (asc/desc)",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "orden_edad",
+            "in": "query",
+            "description": "Ordenar por fecha de nacimiento (asc/desc)",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "nombre",
+            "in": "query",
+            "description": "Filtro para buscar directores por nombre o apellido",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "edad_inferior",
+            "in": "query",
+            "description": "Edad mínima del director",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "edad_superior",
+            "in": "query",
+            "description": "Edad máxima del director",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "nacionalidad",
+            "in": "query",
+            "description": "Filtro por nacionalidad",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de directores filtrados y paginados",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "directores": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/DirectorDetail"
+                      }
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Directores"
+        ],
+        "summary": "Crear un nuevo director",
+        "description": "Registra un nuevo director con sus datos personales.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nombre": {
+                    "type": "string"
+                  },
+                  "apellido": {
+                    "type": "string"
+                  },
+                  "fecha_nacimiento": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "nacionalidad": {
+                    "type": "string"
+                  },
+                  "foto": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                },
+                "required": [
+                  "nombre",
+                  "apellido",
+                  "fecha_nacimiento",
+                  "nacionalidad"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Director creado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "director": {
+                      "$ref": "#/components/schemas/DirectorDetail"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 201
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/directores/{id}": {
+      "get": {
+        "tags": [
+          "Directores"
+        ],
+        "summary": "Obtener detalles de un director",
+        "description": "Retorna la información completa de un director, incluyendo las películas en las que ha participado.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID del director",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalles del director",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "director": {
+                      "$ref": "#/components/schemas/DirectorDetail"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Directores"
+        ],
+        "summary": "Actualizar un director",
+        "description": "Actualiza los datos de un director. Todos los campos son opcionales.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID del director a actualizar",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nombre": {
+                    "type": "string"
+                  },
+                  "apellido": {
+                    "type": "string"
+                  },
+                  "fecha_nacimiento": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "nacionalidad": {
+                    "type": "string"
+                  },
+                  "foto": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Director actualizado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "director": {
+                      "$ref": "#/components/schemas/DirectorDetail"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 202
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/directores/filters-data": {
+      "get": {
+        "tags": [
+          "Directores"
+        ],
+        "summary": "Obtener filtros de datos de directores",
+        "description": "Retorna filtros disponibles como nacionalidades y rangos de edad.",
+        "responses": {
+          "200": {
+            "description": "Filtros de datos de directores",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "filters_data": {
+                      "type": "object",
+                      "properties": {
+                        "nacionalidades": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "edad_inferior": {
+                          "type": "integer"
+                        },
+                        "edad_superior": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generos": {
+      "get": {
+        "tags": [
+          "Géneros"
+        ],
+        "summary": "Obtener todos los géneros con filtros y paginación",
+        "description": "Lista todos los géneros disponibles, con opción a filtrar por nombre y orden alfabético.",
+        "parameters": [
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Cantidad de resultados por página",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Número de página a retornar",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "ordenAlfabetico",
+            "in": "query",
+            "description": "Ordenar alfabéticamente (asc o desc)",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "nombre",
+            "in": "query",
+            "description": "Filtro para buscar géneros por nombre",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de géneros",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "generos": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/GeneroDetail"
+                      }
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Géneros"
+        ],
+        "summary": "Crear un nuevo género",
+        "description": "Crea un nuevo género con los datos proporcionados.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "genero": {
+                    "type": "string",
+                    "description": "Nombre del género"
+                  },
+                  "imagen": {
+                    "type": "string",
+                    "description": "URL de la imagen del género"
+                  }
+                },
+                "required": [
+                  "genero"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Género creado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "genero": {
+                      "$ref": "#/components/schemas/GeneroDetail"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 201
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generos/{id}": {
+      "get": {
+        "tags": [
+          "Géneros"
+        ],
+        "summary": "Obtener detalles de un género",
+        "description": "Obtiene los detalles de un género específico, incluyendo las películas asociadas.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID del género",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalles del género",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "genero": {
+                      "$ref": "#/components/schemas/GeneroDetail"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/estudios": {
+      "get": {
+        "tags": [
+          "Estudios"
+        ],
+        "summary": "Obtener todos los estudios con filtros y paginación",
+        "description": "Lista todos los estudios disponibles, con opciones de filtrado y ordenamiento.",
+        "parameters": [
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Cantidad de resultados por página",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Número de página a retornar",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "ordenAlfabetico",
+            "in": "query",
+            "description": "Ordenar por nombre (asc o desc)",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "ordenAntiguedad",
+            "in": "query",
+            "description": "Ordenar por fundación (asc o desc)",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "nombre",
+            "in": "query",
+            "description": "Filtro para buscar estudios por nombre",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "antiguedad_inferior",
+            "in": "query",
+            "description": "Antigüedad mínima (en años)",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "antiguedad_superior",
+            "in": "query",
+            "description": "Antigüedad máxima (en años)",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pais",
+            "in": "query",
+            "description": "Filtro por país",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de estudios",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "estudios": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EstudioDetail"
+                      }
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Estudios"
+        ],
+        "summary": "Crear un nuevo estudio",
+        "description": "Crea un nuevo estudio con los datos proporcionados.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nombre": {
+                    "type": "string"
+                  },
+                  "pais": {
+                    "type": "string"
+                  },
+                  "fundacion": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "logo": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "nombre",
+                  "pais",
+                  "fundacion"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Estudio creado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "estudio": {
+                      "$ref": "#/components/schemas/EstudioDetail"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 201
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/estudios/{id}": {
+      "get": {
+        "tags": [
+          "Estudios"
+        ],
+        "summary": "Obtener detalles de un estudio",
+        "description": "Retorna la información completa de un estudio, incluyendo las películas asociadas.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID del estudio",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalles del estudio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "estudio": {
+                      "$ref": "#/components/schemas/EstudioDetail"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Estudios"
+        ],
+        "summary": "Actualizar un estudio",
+        "description": "Actualiza los datos de un estudio. Todos los campos son opcionales.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID del estudio a actualizar",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nombre": {
+                    "type": "string"
+                  },
+                  "pais": {
+                    "type": "string"
+                  },
+                  "fundacion": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "logo": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Estudio actualizado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "estudio": {
+                      "$ref": "#/components/schemas/EstudioDetail"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 202
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/estudios/filters-data": {
+      "get": {
+        "tags": [
+          "Estudios"
+        ],
+        "summary": "Obtener filtros de datos de estudios",
+        "description": "Retorna filtros disponibles como países y rangos de antigüedad.",
+        "responses": {
+          "200": {
+            "description": "Filtros de datos de estudios",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "filters_data": {
+                      "type": "object",
+                      "properties": {
+                        "paises": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "antiguedad_inferior": {
+                          "type": "integer"
+                        },
+                        "antiguedad_superior": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PeliculaDetail": {
+        "type": "object",
+        "description": "Representa la información completa de una película.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "titulo": {
+            "type": "string",
+            "example": "La La Land"
+          },
+          "estreno": {
+            "type": "string",
+            "format": "date",
+            "example": "2016-12-09"
+          },
+          "taquilla": {
+            "type": "number",
+            "example": 447407706
+          },
+          "pais": {
+            "type": "string",
+            "example": "Estados Unidos"
+          },
+          "estudio": {
+            "type": "string",
+            "example": "Warner Bros."
+          },
+          "director": {
+            "type": "string",
+            "example": "Damien Chazelle"
+          },
+          "generos": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "Musical",
+              "Romance"
+            ]
+          },
+          "actores": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "Ryan Gosling",
+              "Emma Stone"
+            ]
+          },
+          "posters": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            },
+            "example": [
+              "https://media-cache.cinematerial.com/p/500x/unoktgtv/la-la-land-movie-poster.jpg?v=1472589717"
+            ]
+          },
+          "sinopsis": {
+            "type": "string",
+            "example": "Sebastian, un pianista de jazz, y Mia, una aspirante a actriz, se enamoran locamente..."
+          }
+        }
+      },
+      "ActoreDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID del actor"
+          },
+          "nombre": {
+            "type": "string",
+            "description": "Nombre completo del actor"
+          },
+          "fecha_nacimiento": {
+            "type": "string",
+            "format": "date",
+            "description": "Fecha de nacimiento del actor"
+          },
+          "edad": {
+            "type": "integer",
+            "description": "Edad del actor"
+          },
+          "nacionalidad": {
+            "type": "string",
+            "description": "Nacionalidad del actor"
+          },
+          "foto": {
+            "type": "string",
+            "description": "URL de la foto del actor"
+          },
+          "peliculas": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Lista de títulos de las películas en las que el actor ha participado"
+          }
+        }
+      },
+      "GeneroDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "genero": {
+            "type": "string"
+          },
+          "imagen": {
+            "type": "string"
+          }
+        }
+      },
+      "DirectorDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "nombre": {
+            "type": "string",
+            "description": "Nombre completo del director (nombre y apellido concatenados)"
+          },
+          "fecha_nacimiento": {
+            "type": "string",
+            "format": "date",
+            "description": "Fecha de nacimiento del director"
+          },
+          "edad": {
+            "type": "integer",
+            "description": "Edad calculada del director"
+          },
+          "nacionalidad": {
+            "type": "string"
+          },
+          "foto": {
+            "type": "string",
+            "description": "URL de la imagen del director"
+          },
+          "peliculas": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Lista de títulos de las películas en las que el director ha participado"
+          }
+        }
+      },
+      "EstudioDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "pais": {
+            "type": "string"
+          },
+          "fundacion": {
+            "type": "string",
+            "format": "date"
+          },
+          "logo": {
+            "type": "string"
+          },
+          "peliculas": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Lista de títulos de las películas asociadas (opcional)"
+          }
+        }
+      }
+    }
+  }
+}
