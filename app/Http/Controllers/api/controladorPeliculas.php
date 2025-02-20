@@ -339,6 +339,8 @@ class controladorPeliculas extends Controller
 		$directores = Directore::selectRaw("CONCAT(nombre, ' ', apellido) as nombre_completo")->pluck('nombre_completo');
 
 		$generos = Genero::pluck('nombre');
+
+		$peliculasTotales = Pelicula::count();
     
         $filtersData = [
             'paises' => $paises,
@@ -350,6 +352,7 @@ class controladorPeliculas extends Controller
 			'actores' => $actores,
 			'directores' => $directores,
 			'generos' => $generos,
+			'peliculas_totales' => $peliculasTotales,
         ];
     
         if (!$filtersData) {
