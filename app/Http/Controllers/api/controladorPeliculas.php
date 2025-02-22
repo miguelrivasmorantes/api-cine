@@ -101,6 +101,34 @@ class controladorPeliculas extends Controller
 				];
 		});
 
+		$totalPeliculas = Pelicula::
+			when($titulo, fn($q) => $q->where('titulo', 'like', "%{$titulo}%"))
+			->when($tituloInicio, fn($q) => $q->where('titulo', 'like', "{$tituloInicio}%"))
+			->when($director, fn($q) => 
+				$q->whereHas('director', fn($q) => 
+					$q->whereRaw("CONCAT(nombre, ' ', apellido) LIKE ?", ["%{$director}%"])
+				)
+			)
+			->when($estudio, fn($q) => $q->whereHas('estudio', fn($q) => $q->where('nombre', 'like', "%{$estudio}%")))
+			->when($generos, function ($q) use ($generos) {
+				foreach ((array) $generos as $genero) {
+					$q->whereHas('generos', fn($q) => $q->where('nombre', 'like', "%{$genero}%"));
+				}
+			})
+			->when($actores, function ($q) use ($actores) {
+				foreach ((array) $actores as $actor) {
+					$q->whereHas('actores', fn($q) => 
+						$q->whereRaw("CONCAT(nombre, ' ', apellido) LIKE ?", ["%{$actor}%"])
+					);
+				}
+			})
+			->when($taquillaInferior, fn($q) => $q->where('taquilla', '>=', $taquillaInferior))
+			->when($taquillaSuperior, fn($q) => $q->where('taquilla', '<=', $taquillaSuperior))
+			->when($estrenoInferior, fn($q) => $q->where('estreno', '>=', $estrenoInferior))
+			->when($estrenoSuperior, fn($q) => $q->where('estreno', '<=', $estrenoSuperior))
+			->when($pais, fn($q) => $q->where('pais', 'like', "%{$pais}%"))
+			->count();
+
 		if (!$peliculas) {
 			return response()->json(['message' => 'No se encontraron peliculas', 'status' => 200]);
 		}
@@ -112,6 +140,7 @@ class controladorPeliculas extends Controller
 		$data = [
 			'peliculas' => $peliculas,
 			'status' => 200,
+			'peliculas_totales' => $totalPeliculas,
 		];
 	
 		return $data;
